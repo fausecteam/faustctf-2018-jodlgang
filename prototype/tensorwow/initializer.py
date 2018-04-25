@@ -1,3 +1,4 @@
+import scipy.stats as stats
 import numpy as np
 
 
@@ -16,3 +17,14 @@ class ConstantInitializer(object):
 
     def initialize(self, size):
         return self._constant * np.ones(size, dtype=np.float)
+
+
+class TruncatedNormalInitializer(object):
+    def __init__(self, mean, stddev):
+        self._mean = mean
+        self._stddev = stddev
+
+    def initialize(self, size):
+        return stats.truncnorm(-2, +2, loc=self._mean, scale=self._stddev)\
+            .rvs(np.prod(size))\
+            .reshape(size)
