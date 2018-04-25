@@ -1,7 +1,7 @@
-from initializer import XavierInitializer, ConstantInitializer
-from functions import RectifiedLinearUnit, Softmax, LogLikelihoodLoss
-from layers import FullyConnectedLayer
-from network import Network
+from .initializer import XavierInitializer, ConstantInitializer
+from .functions import RectifiedLinearUnit, Softmax, LogLikelihoodLoss
+from .layers import FullyConnectedLayer
+from .network import Network
 import tensorflow as tf
 import numpy as np
 

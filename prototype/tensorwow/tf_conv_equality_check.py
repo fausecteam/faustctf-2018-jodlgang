@@ -1,7 +1,7 @@
 import tensorflow as tf
-from layers import ConvLayer
-from functions import LinearUnit
-from initializer import ConstantInitializer
+from .layers import ConvLayer
+from .functions import LinearUnit
+from .initializer import ConstantInitializer
 import numpy as np
 
 

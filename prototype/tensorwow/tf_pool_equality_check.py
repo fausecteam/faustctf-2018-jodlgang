@@ -1,5 +1,5 @@
 import tensorflow as tf
-from layers import MaxPoolLayer
+from .layers import MaxPoolLayer
 import numpy as np
 
 
