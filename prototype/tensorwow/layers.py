@@ -1,5 +1,5 @@
 import numpy as np
-from im2col import im2col_indices
+from .im2col import im2col_indices
 
 
 class FullyConnectedLayer(object):
@@ -36,10 +36,16 @@ class FullyConnectedLayer(object):
     @property
     def weights(self):
         """
-
         :return: D x M matrix
         """
         return self._weights
+
+    @weights.setter
+    def weights(self, weights):
+        if weights.shape != (self._num_input_units, self._num_output_units):
+            raise ValueError("Invalid dimensions")
+
+        self._weights = weights
 
     @property
     def bias(self):
@@ -47,6 +53,13 @@ class FullyConnectedLayer(object):
         :return: vector of length M
         """
         return self._bias
+
+    @bias.setter
+    def bias(self, bias):
+        if bias.shape != (self._num_output_units,):
+            raise ValueError("Invalid dimensions")
+
+        self._bias = bias
 
     def forward(self, x):
         """
@@ -153,6 +166,34 @@ class ConvLayer(object):
         self._weights = weights_initializer.initialize((kernel_size, kernel_size, num_input_channels, num_filters))
         self._bias = bias_initializer.initialize((num_filters, 1))
 
+    @property
+    def weights(self):
+        """
+        :return: Weight matrix of shape (kernel_size, kernel_size, num_input_channels, num_filters)
+        """
+        return self._weights
+
+    @property
+    def bias(self):
+        """
+        :return: Bias vector of length num_filters
+        """
+        return self._bias
+
+    @weights.setter
+    def weights(self, weights):
+        if weights.shape != (self._kernel_size, self._kernel_size, self._num_input_channels, self._num_filters):
+            raise ValueError("Invalid dimensions")
+
+        self._weights = weights
+
+    @bias.setter
+    def bias(self, bias):
+        if bias.shape != (self._num_filters,):
+            raise ValueError("Invalid dimensions")
+
+        self._bias = bias
+
     def forward(self, x):
         """
         Computes the correlation of each input sample with the layer's kernel matrix
@@ -174,7 +215,7 @@ class ConvLayer(object):
         # To make the filter matrix appear for each channel contiguously, move the channels dimension to the front as well
         weights_col = self._weights.transpose(3, 2, 0, 1).reshape(self._num_filters, -1)
 
-        z = np.dot(weights_col, x_col) + self._bias
+        z = np.dot(weights_col, x_col) + self._bias[:, None]
         a = self._activation_func.compute(z)
         # Found this order through experimenting
         a = a.reshape(self._num_filters, num_samples, output_height, output_width).transpose(1, 2, 3, 0)
