@@ -100,7 +100,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = "fomoplatform.User"
+AUTH_USER_MODEL = 'fomoplatform.User'
+
+AUTHENTICATION_BACKENDS = ('fomoplatform.backends.FaceAuthenticationBackend', 'django.contrib.auth.backends.ModelBackend')
 
 
 # Internationalization
