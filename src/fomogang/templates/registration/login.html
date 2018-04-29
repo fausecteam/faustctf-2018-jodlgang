@@ -1,0 +1,40 @@
+{% extends "raw_base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}
+<title>Login</title>
+<link href="{% static 'css/login.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    {% if form.errors %}
+        <p>Your username and password didn't match. Please try again.</p>
+    {% endif %}
+
+    {% if next %}
+        {% if user.is_authenticated %}
+            <p>Your account doesn't have access to this page. To proceed,
+                please login with an account that has access.</p>
+        {% else %}
+            <p>Please login to see this page.</p>
+        {% endif %}
+    {% endif %}
+
+    <form class="form-signin" method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <div class="text-center">
+            <img class="mb-4" src="https://getbootstrap.com/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
+            <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+        </div>
+
+        {{ form.username.label_tag }}
+        {% render_field form.username class="form-control" %}
+
+        {{ form.password.label_tag }}
+        {% render_field form.password class="form-control" %}
+
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+    </form>
+{% endblock %}

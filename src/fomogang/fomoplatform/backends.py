@@ -2,12 +2,12 @@ from django.conf import settings
 from .models import User
 
 
-class FaceAuthenticationBackend:
-    def authenticate(self, email, password):
+class FaceAuthenticationBackend(object):
+    def authenticate(self, request, **kwargs):
         # Check the token and return the user
         try:
-            user = User.objects.get(email=email)
-            if user.check_password(password):
+            user = User.objects.get(email=kwargs["username"])
+            if user.check_password(kwargs["password"]):
                 return user
             else:
                 return None
