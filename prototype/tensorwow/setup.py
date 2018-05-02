@@ -10,5 +10,6 @@ extensions = [
 ]
 
 setup(
+    name="tensorwow",
     ext_modules=cythonize(extensions),
 )
