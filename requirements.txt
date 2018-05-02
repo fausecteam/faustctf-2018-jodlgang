@@ -1,0 +1,4 @@
+scikit-image
+imageio
+django
+django-widget-tweaks
