@@ -1,5 +1,5 @@
 import numpy as np
-from .im2col import im2col_indices
+from tensorwow.im2col import im2col_indices
 
 
 class FullyConnectedLayer(object):
