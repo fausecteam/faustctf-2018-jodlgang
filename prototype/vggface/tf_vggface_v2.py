@@ -214,7 +214,7 @@ class VGGFace(object):
         labels = tf.placeholder(tf.int64, [None,])
 
         with tf.name_scope("accuracy"):
-            accuracy = tf.equal(tf.argmax(self._output, axis=1), labels)
+            accuracy = tf.cast(tf.equal(tf.argmax(self._output, axis=1), labels), tf.float32)
 
         with tf.name_scope("loss"):
             loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=self._output_logits))
