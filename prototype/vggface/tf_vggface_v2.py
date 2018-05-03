@@ -265,26 +265,26 @@ class VGGFace(object):
             _, loss_val, global_step_val = self._sess.run([train_op, loss, global_step], feed_dict=feed_dict)
 
             if global_step_val % num_steps_to_check_loss == 0:
-                print("Loss: {:3.2f}, Patience: {:d}".format(loss_val, patience))
+                print("Step: {:d}, Loss: {:3.2f}, Patience: {:d}".format(global_step_val, loss_val, patience))
                 feed_dict = {self._images: image_batch, labels: label_batch, self._drop_rate: 0}
                 summary_val = self._sess.run(summary_op, feed_dict=feed_dict)
                 # Write summary
                 training_summary_writer.add_summary(summary_val, global_step=global_step_val)
 
             if global_step_val % num_steps_to_check_validation_set == 0:
-                accuracies = []
+                accuracy_batches = []
                 self._sess.run(validation_iterator.initializer)
                 validation_set_exhausted = False
                 while not validation_set_exhausted:
                     try:
                         image_batch, label_batch = self._sess.run(next_element, feed_dict={handle: validation_handle})
                         accuracy_batch = self._sess.run(accuracy, feed_dict={self._images: image_batch, labels: label_batch, self._drop_rate: 0})
-                        accuracies.append(accuracy_batch)
+                        accuracy_batches.append(accuracy_batch)
                     except tf.errors.OutOfRangeError:
                         validation_set_exhausted = True
 
                 # Average accuracies
-                average_accuracy = np.mean(accuracies)
+                average_accuracy = np.mean(np.concatenate(accuracy_batches))
 
                 summary = tf.Summary()
                 summary.value.add(tag="accuracy", simple_value=average_accuracy)
