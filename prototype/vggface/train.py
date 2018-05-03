@@ -8,6 +8,7 @@ if __name__ == "__main__":
     parser.add_argument("training_tfrecords_file", type=str, help="Path to training data")
     parser.add_argument("validation_tfrecords_file", type=str, help="Path to validation data")
     parser.add_argument("num_classes", type=int, help="Number of individuals")
+    parser.add_argument("--learning_rate", type=float, help="Learning rate", default=1e-2)
     parser.add_argument("--checkpoint_dir", type=str, help="Directory where to store checkpoint", default="checkpoint")
     parser.add_argument("--summary_dir", type=str, help="Directory where to store summary", default="summary")
     parser.add_argument("--vggface_trained_weights", type=str, help="Restore conv weights from this file is no checkpoint to load is available")

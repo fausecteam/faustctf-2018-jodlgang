@@ -1,6 +1,7 @@
 from vggface.ops import conv2d_relu, max_pool_2x2, weights_variable_truncated_normal, bias_variable
 import tensorflow as tf
 import numpy as np
+import time
 import h5py
 import os
 
@@ -86,11 +87,13 @@ class VGGFace(object):
 
     @staticmethod
     def restore_vggface_conv_weights(sess, weights_file):
-        sess.run(tf.global_variables_initializer())
-
         with h5py.File(weights_file, "r") as f:
             layers = list(f.keys())
             for layer in layers:
+                # Only consider convolutional layers
+                if not layer.startswith("conv"):
+                    continue
+
                 layer_layers = list(f[layer].keys())
                 # Don't consider empty weights like for pooling or flatten operations
                 if len(layer_layers) == 0:
@@ -109,6 +112,7 @@ class VGGFace(object):
                     with tf.variable_scope(layer, reuse=True):
                         tf_variable = tf.get_variable("{}_{}".format(layer, parameter_name))
                         sess.run(tf.assign(tf_variable, trained_value))
+        return True
 
     def inference(self, imgs):
         predictions = self._sess.run(self._output, feed_dict={self._images: imgs, self._drop_rate: 0})
@@ -176,6 +180,11 @@ class VGGFace(object):
         assert os.path.exists(training_tfrecords_file), "training set file does not exist"
         assert os.path.exists(validation_tfrecords_file), "validation set file does not exist"
 
+        # Some constants
+        initial_patience = 50
+        num_steps_to_check_validation_set = 1000
+        num_steps_to_check_loss = 100
+
         # Set up dataset handling
         # Training dataset
         train_dataset = tf.data.TFRecordDataset([training_tfrecords_file])
@@ -208,7 +217,7 @@ class VGGFace(object):
             accuracy = tf.equal(tf.argmax(self._output, axis=1), labels)
 
         with tf.name_scope("loss"):
-            loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=self._output_logits)
+            loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=self._output_logits))
 
         with tf.name_scope("optimizer"):
             global_step = tf.Variable(0, name="global_step", trainable=False)
@@ -220,13 +229,19 @@ class VGGFace(object):
 
         # Summary
         loss_summary = tf.summary.scalar("loss", loss)
-        summary_op = tf.summary.merge([loss_summary])
-        summary_writer = tf.summary.FileWriter(summary_dir, graph=self._sess.graph)
+        accuracy_summary = tf.summary.scalar("accuracy", tf.reduce_mean(accuracy))
+        summary_op = tf.summary.merge([loss_summary, accuracy_summary])
 
-        initial_patience = 50
+        # Prepare paths for summaries
+        summary_dir_name = time.strftime("%Y_%m_%d_%H_%M_%S") + "-" + os.path.basename(__file__)
+        training_summary_dir = os.path.join(summary_dir, summary_dir_name, "training")
+        validation_summary_dir = os.path.join(summary_dir, summary_dir_name, "validation")
+        # Create two different summary writers to give statistics on training and validation images
+        training_summary_writer = tf.summary.FileWriter(training_summary_dir, graph=self._sess.graph)
+        # Set up evaluation summary writer without graph to avoid overlap with training graph
+        validation_summary_writer = tf.summary.FileWriter(validation_summary_dir)
+
         patience = initial_patience
-        num_steps_to_check_validation_set = 1000
-        num_steps_to_check_loss = 100
         best_validation_accuracy = 0
 
         self._sess.run(tf.global_variables_initializer())
@@ -240,6 +255,8 @@ class VGGFace(object):
             print("Creating a new model")
 
         training_handle = self._sess.run(training_iterator.string_handle())
+        validation_handle = self._sess.run(validation_iterator.string_handle())
+        self._sess.run(training_iterator.initializer)
 
         while patience > 0:
             # Fetch batch
@@ -252,11 +269,11 @@ class VGGFace(object):
                 feed_dict = {self._images: image_batch, labels: label_batch, self._drop_rate: 0}
                 summary_val = self._sess.run(summary_op, feed_dict=feed_dict)
                 # Write summary
-                summary_writer.add_summary(summary_val, global_step=global_step_val)
+                training_summary_writer.add_summary(summary_val, global_step=global_step_val)
 
             if global_step_val % num_steps_to_check_validation_set == 0:
                 accuracies = []
-                validation_handle = self._sess.run(validation_iterator.string_handle())
+                self._sess.run(validation_iterator.initializer)
                 validation_set_exhausted = False
                 while not validation_set_exhausted:
                     try:
@@ -271,7 +288,7 @@ class VGGFace(object):
 
                 summary = tf.Summary()
                 summary.value.add(tag="accuracy", simple_value=average_accuracy)
-                summary_writer.add_summary(summary, global_step=global_step_val)
+                validation_summary_writer.add_summary(summary, global_step=global_step_val)
 
                 if average_accuracy > best_validation_accuracy:
                     self.store(global_step_val)

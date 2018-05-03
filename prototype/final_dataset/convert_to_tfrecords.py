@@ -1,3 +1,6 @@
+"""
+Helper methods are from https://github.com/tensorflow/models/blob/master/research/inception/inception/data/build_image_data.py
+"""
 import tensorflow as tf
 import argparse
 import random
