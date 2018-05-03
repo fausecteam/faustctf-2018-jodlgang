@@ -1,5 +1,6 @@
 from scipy.misc import imread
 import tensorflow as tf
+import numpy as np
 import argparse
 import random
 import json
@@ -31,6 +32,9 @@ def collect(data_dir, name_to_class_label_mapping_file, output_file):
 
         img_file = img_files[i]
         img = imread(img_file)
+        if len(img.shape) == 2 or img.shape[2] == 1:
+            img = np.stack((img, img, img), axis=2)
+
         label = name_to_class_label_mapping[os.path.basename(os.path.dirname(img_file))]
 
         # Create a feature
