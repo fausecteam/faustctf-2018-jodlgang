@@ -1,8 +1,7 @@
+from vggface.ops import conv2d_relu, max_pool_2x2, weights_variable_truncated_normal, bias_variable
 import tensorflow as tf
 import numpy as np
 import h5py
-from vggface.ops import conv2d_relu, max_pool_2x2, weights_variable_truncated_normal, bias_variable
-from scipy.misc import imread
 import os
 
 
@@ -133,82 +132,148 @@ class VGGFace(object):
         original_imgs = original_imgs[..., ::-1]
         return original_imgs
 
-    def finetune(self, training_tfrecords_file, validation_tfrecords_file, summary_dir):
+    def load(self, checkpoint_dir, saver):
+        print("Attempting to read checkpoint from {}".format(checkpoint_dir))
+
+        checkpoint = tf.train.get_checkpoint_state(checkpoint_dir)
+        if checkpoint and checkpoint.model_checkpoint_path:
+            saver.restore(self._sess, checkpoint.model_checkpoint_path)
+            print("Successfully restored checkpoint")
+            return True
+
+        print("Failed to restore checkpoint")
+        return False
+
+    def store(self, checkpoint_dir, saver, step):
+        if not os.path.exists(checkpoint_dir):
+            os.makedirs(checkpoint_dir)
+
+        path = saver.save(self._sess, os.path.join(checkpoint_dir, os.path.basename(__file__)), global_step=step)
+        print("Stored model at step {}".format(step))
+        return path
+
+    @staticmethod
+    def _parse_function(proto):
+        features = {
+            "image": tf.FixedLenFeature([], tf.string),
+            "label": tf.FixedLenFeature([], tf.int64)
+        }
+
+        parsed_features = tf.parse_single_example(proto, features)
+
+        image_buffer = parsed_features["image"]
+        label = tf.cast(parsed_features["label"], tf.int32)
+
+        with tf.name_scope("decode_jpeg", [image_buffer], None):
+            image = tf.image.decode_jpeg(image_buffer, channels=3)
+            image = tf.image.convert_image_dtype(image, dtype=tf.float32)
+
+        image = tf.reshape(image, [224, 224, 3])
+
+        return image, label
+
+    def train(self, training_tfrecords_file, validation_tfrecords_file, learning_rate, checkpoint_dir, summary_dir, vggface_trained_weights=None):
         assert os.path.exists(training_tfrecords_file), "training set file does not exist"
         assert os.path.exists(validation_tfrecords_file), "validation set file does not exist"
 
-        #
-        # Set up input data queues
-        #
-        feature = {"train/image": tf.FixedLenFeature([], tf.string),
-                   "train/label": tf.FixedLenFeature([], tf.int64)}
+        # Set up dataset handling
+        # Training dataset
+        train_dataset = tf.data.TFRecordDataset([training_tfrecords_file])
+        # Parse the record into tensors
+        train_dataset = train_dataset.map(self._parse_function, num_parallel_calls=4)
+        # Infinitely many iterations
+        train_dataset = train_dataset.repeat(None)
+        train_dataset = train_dataset.shuffle(buffer_size=1000)
+        train_dataset = train_dataset.prefetch(buffer_size=1000)
+        train_dataset = train_dataset.batch(32)
 
-        # Create list of file names and pass it to a queue
-        # As long as we don't provide the num_epochs argument, this will cycle through the input infinitely many times
-        filename_queue = tf.train.string_input_producer([training_tfrecords_file])
+        # Validation dataset
+        validation_dataset = tf.data.TFRecordDataset([validation_tfrecords_file])
+        validation_dataset = validation_dataset.map(self._parse_function, num_parallel_calls=4)
+        validation_dataset = validation_dataset.prefetch(buffer_size=100)
+        validation_dataset = validation_dataset.batch(32)
 
-        # Define a reader and read the next record
-        reader = tf.TFRecordReader()
-        _, serialized_example = reader.read(filename_queue)
+        handle = tf.placeholder(tf.string, shape=[])
+        iterator = tf.contrib.data.Iterator.from_string_handle(handle, train_dataset.output_types,
+                                                               train_dataset.output_shapes)
+        next_element = iterator.get_next()
 
-        # Decode the record read by the reader
-        features = tf.parse_single_example(serialized_example, features=feature)
+        training_iterator = train_dataset.make_initializable_iterator()
+        validation_iterator = validation_dataset.make_initializable_iterator()
 
-        # Convert the image data from string back to numbers
-        image = tf.decode_raw(features["train/image"], tf.uint8)
-        # Reshape image data into the original shape
-        image = tf.cast(tf.reshape(image, [224, 224, 3]), tf.float32)
+        # Set up loss and optimization
+        labels = tf.placeholder(tf.int64, [None,])
 
-        # Cast label data into int32
-        label = tf.cast(features["train/label"], tf.int32)
-
-        # Create batches by randomly shuffling tensors
-        images, labels = tf.train.shuffle_batch([image, label], batch_size=64, capacity=512, num_threads=4, min_after_dequeue=128)
-
-        #
-        # Set up optimization
-        #
-        labels = tf.placeholder(tf.float32, [None,])
+        with tf.name_scope("accuracy"):
+            accuracy = tf.equal(tf.argmax(self._output, axis=1), labels)
 
         with tf.name_scope("loss"):
-            loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=self._output_logits))
+            loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=self._output_logits)
 
         with tf.name_scope("optimizer"):
             global_step = tf.Variable(0, name="global_step", trainable=False)
-            optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
+            optimizer = tf.train.AdamOptimizer(learning_rate)
             train_op = optimizer.minimize(loss, global_step=global_step)
+
+        # Checkpoint saver
+        saver = tf.train.Saver(max_to_keep=1, save_relative_paths=True)
 
         # Summary
         loss_summary = tf.summary.scalar("loss", loss)
-        training_summary_writer = tf.summary.FileWriter(summary_dir, graph=self._sess.graph)
+        summary_op = tf.summary.merge([loss_summary])
+        summary_writer = tf.summary.FileWriter(summary_dir, graph=self._sess.graph)
 
-        # Initialize all global and local variables
-        init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+        initial_patience = 50
+        patience = initial_patience
+        num_steps_to_check_validation_set = 1000
+        num_steps_to_check_loss = 100
+        best_validation_accuracy = 0
 
-        self._sess.run(init_op)
+        self._sess.run(tf.global_variables_initializer())
 
-        # Create a coordinator and run all QueueRunner objects
-        coord = tf.train.Coordinator()
-        threads = tf.train.start_queue_runners(coord=coord)
+        # Attempt to restore checkpoint
+        if self.load(checkpoint_dir, saver):
+            print("Restored trained model")
+        elif vggface_trained_weights and self.restore_vggface_conv_weights(self._sess, vggface_trained_weights):
+            print("Restored VGGFace weights")
+        else:
+            print("Creating a new model")
 
-        patience = 50
-        num_steps_to_eval_validation_set = 100
+        training_handle = self._sess.run(training_iterator.string_handle())
 
-        try:
-            while patience > 0:
-                image_batch, label_batch = self._sess.run([images, labels])
+        while patience > 0:
+            # Fetch batch
+            image_batch, label_batch = self._sess.run(next_element, feed_dict={handle: training_handle})
+            feed_dict = {self._images: image_batch, labels: label_batch, self._drop_rate: 0.5}
+            _, loss_val, global_step_val = self._sess.run([train_op, loss, global_step], feed_dict=feed_dict)
 
-                _, loss_val, global_step_val = self._sess.run([train_op, loss, global_step],
-                                                              feed_dict={self._images: image_batch,
-                                                                         labels: label_batch,
-                                                                         self._drop_rate: 0.5})
+            if global_step_val % num_steps_to_check_loss == 0:
+                print("Loss: {:3.2f}, Patience: {:d}".format(loss_val, patience))
+                feed_dict = {self._images: image_batch, labels: label_batch, self._drop_rate: 0}
+                summary_val = self._sess.run(summary_op, feed_dict=feed_dict)
+                # Write summary
+                summary_writer.add_summary(summary_val, global_step=global_step_val)
 
-                if global_step_val % num_steps_to_eval_validation_set == 0:
-                    # TODO Eval
+            if global_step_val % num_steps_to_check_validation_set == 0:
+                accuracies = []
+                validation_handle = self._sess.run(validation_iterator.string_handle())
+                validation_set_exhausted = False
+                while not validation_set_exhausted:
+                    try:
+                        image_batch, label_batch = self._sess.run(next_element, feed_dict={handle: validation_handle})
+                        accuracy_batch = self._sess.run(accuracy, feed_dict={self._images: image_batch, labels: label_batch, self._drop_rate: 0})
+                        accuracies.append(accuracy_batch)
+                    except tf.errors.OutOfRangeError:
+                        validation_set_exhausted = True
 
-        finally:
-            # Stop the threads
-            coord.request_stop()
+                # Average accuracies
+                average_accuracy = np.mean(accuracies)
 
-            # Wait for threads to stop
-            coord.join(threads)
+                summary = tf.Summary()
+                summary.value.add(tag="accuracy", simple_value=average_accuracy)
+                summary_writer.add_summary(summary, global_step=global_step_val)
+
+                if average_accuracy > best_validation_accuracy:
+                    self.store(global_step_val)
+                    patience = initial_patience
+                    best_validation_accuracy = average_accuracy
