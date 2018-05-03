@@ -291,6 +291,6 @@ class VGGFace(object):
                 validation_summary_writer.add_summary(summary, global_step=global_step_val)
 
                 if average_accuracy > best_validation_accuracy:
-                    self.store(global_step_val)
+                    self.store(checkpoint_dir, saver, global_step_val)
                     patience = initial_patience
                     best_validation_accuracy = average_accuracy
