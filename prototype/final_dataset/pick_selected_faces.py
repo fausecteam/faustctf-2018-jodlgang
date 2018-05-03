@@ -25,12 +25,16 @@ def write_image(path, img):
 def add_white_noise(img):
     return img_as_ubyte(random_noise(img))
 
+def reflect_image(img):
+    return img[:, ::-1]
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('dataset_directory')
 parser.add_argument('out_dir')
 parser.add_argument('-n', '--number_of_pictures_per', type=int, default=20)
-parser.add_argument('-o', '--output_shape', default='250x250')
+parser.add_argument('-o', '--output_shape', default='224x224')
+parser.add_argument('-v', '--validation-split', default=0.2)
 args = parser.parse_args()
 
 output_shape = tuple(map(int, args.output_shape.split('x')))
@@ -47,8 +51,9 @@ for category in os.listdir(args.dataset_directory):
         images = os.listdir(celeb_dir)
 
         selected_pics = np.random.permutation(images)[:args.number_of_pictures_per]
+        training_pic_length = int(len(selected_pics) * args.validation_split)
 
-        for pic_path in selected_pics:
+        for i, pic_path in enumerate(selected_pics):
             pic_path = os.path.join(celeb_dir, pic_path)
 
             split_name = os.path.basename(pic_path).split('.')
@@ -58,11 +63,14 @@ for category in os.listdir(args.dataset_directory):
 
             #ipdb.set_trace()
             resized = resize(img, output_shape=output_shape)
+            reflected = reflect_image(resized)
 
-            out_dir = os.path.join(args.out_dir, category, 'faces', celeb)
+            if i < training_pic_length:
+                out_dir = os.path.join(args.out_dir, 'validation', category, 'faces', celeb)
+            else:
+                out_dir = os.path.join(args.out_dir, 'training', category, 'faces', celeb)
 
-            #write_image(os.path.join(out_dir, '{}_resized.{}'.format(file_name, file_ext)), img)
-            write_image(os.path.join(out_dir, '{}_noise0.{}'.format(file_name, file_ext)), add_white_noise(img))
-            write_image(os.path.join(out_dir, '{}_noise1.{}'.format(file_name, file_ext)), add_white_noise(img))
-            write_image(os.path.join(out_dir, '{}_noise2.{}'.format(file_name, file_ext)), add_white_noise(img))
-            write_image(os.path.join(out_dir, '{}_noise3.{}'.format(file_name, file_ext)), add_white_noise(img))
+            write_image(os.path.join(out_dir, '{}_original_noise0.{}'.format(file_name, file_ext)), add_white_noise(img))
+            write_image(os.path.join(out_dir, '{}_original_noise1.{}'.format(file_name, file_ext)), add_white_noise(img))
+            write_image(os.path.join(out_dir, '{}_reflected_noise0.{}'.format(file_name, file_ext)), add_white_noise(reflected))
+            write_image(os.path.join(out_dir, '{}_reflected_noise1.{}'.format(file_name, file_ext)), add_white_noise(reflected))
