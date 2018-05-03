@@ -233,7 +233,7 @@ class VGGFace(object):
         summary_op = tf.summary.merge([loss_summary, accuracy_summary])
 
         # Prepare paths for summaries
-        summary_dir_name = time.strftime("%Y_%m_%d_%H_%M_%S") + "-" + os.path.basename(__file__)
+        summary_dir_name = time.strftime("%Y_%m_%d_%H_%M_%S") + "-VGGFace_v2"
         training_summary_dir = os.path.join(summary_dir, summary_dir_name, "training")
         validation_summary_dir = os.path.join(summary_dir, summary_dir_name, "validation")
         # Create two different summary writers to give statistics on training and validation images
