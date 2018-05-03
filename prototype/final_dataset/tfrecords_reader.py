@@ -73,6 +73,8 @@ def display(tfrecords_filename, name_to_class_label_mapping_file):
 
 
 if __name__ == "__main__":
+    print("Deprecated: Use `tfrecords_reader_data_api` instead")
+
     parser = argparse.ArgumentParser()
     parser.add_argument("input_file", type=str, help="Path to tfrecords file of data set to display")
     parser.add_argument("name_to_class_label_mapping_output_file", type=str, help="Json file containing list of actor/actress folder names")

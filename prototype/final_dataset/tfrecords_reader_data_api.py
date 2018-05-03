@@ -28,6 +28,8 @@ def load_dataset(training_tfrecords_file, validation_tfrecords_file):
     train_dataset = tf.data.TFRecordDataset([training_tfrecords_file])
     # Parse the record into tensors
     train_dataset = train_dataset.map(_parse_function, num_parallel_calls=4)
+    # Infinitely many iterations
+    train_dataset = train_dataset.repeat(None)
     train_dataset = train_dataset.shuffle(buffer_size=1000)
     train_dataset = train_dataset.prefetch(buffer_size=1000)
     train_dataset = train_dataset.batch(6)
@@ -43,7 +45,7 @@ def load_dataset(training_tfrecords_file, validation_tfrecords_file):
     next_element = iterator.get_next()
 
     training_iterator = train_dataset.make_initializable_iterator()
-    validation_iterator = validation_dataset.make_one_shot_iterator()
+    validation_iterator = validation_dataset.make_initializable_iterator()
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
