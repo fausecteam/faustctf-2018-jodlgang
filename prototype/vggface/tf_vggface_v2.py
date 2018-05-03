@@ -21,20 +21,9 @@ class VGGFace(object):
 
     @staticmethod
     def model(input, drop_rate, num_classes):
-        # Preprocessing:
-        # Convert RGB to BGR
-        bgr_input = tf.reverse(input, axis=[-1])
-
-        # Subtract channel-wise mean
-        b, g, r = tf.split(bgr_input, num_or_size_splits=3, axis=3)
-        b_sub = tf.subtract(b, 93.5940)
-        g_sub = tf.subtract(g, 104.7624)
-        r_sub = tf.subtract(r, 129.1863)
-        concat = tf.concat([b_sub, g_sub, r_sub], axis=3)
-
         # Block 1
         # (224, 224, 3) -> (112, 112, 64)
-        conv1_1 = conv2d_relu(concat, 64, "conv1_1")
+        conv1_1 = conv2d_relu(input, 64, "conv1_1")
         conv1_2 = conv2d_relu(conv1_1, 64, "conv1_2")
         pool1 = max_pool_2x2(conv1_2)
 
@@ -174,7 +163,8 @@ class VGGFace(object):
 
         with tf.name_scope("decode_jpeg", [image_buffer], None):
             image = tf.image.decode_jpeg(image_buffer, channels=3)
-            image = tf.image.convert_image_dtype(image, dtype=tf.float32)
+            image = tf.cast(image, tf.float32)
+            #image = tf.image.convert_image_dtype(image, dtype=tf.float32)
 
         image = tf.reshape(image, [224, 224, 3])
 
