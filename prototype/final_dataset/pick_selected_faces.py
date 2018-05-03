@@ -70,7 +70,9 @@ for category in os.listdir(args.dataset_directory):
             else:
                 out_dir = os.path.join(args.out_dir, 'training', category, 'faces', celeb)
 
-            write_image(os.path.join(out_dir, '{}_original_noise0.{}'.format(file_name, file_ext)), add_white_noise(img))
-            write_image(os.path.join(out_dir, '{}_original_noise1.{}'.format(file_name, file_ext)), add_white_noise(img))
+            write_image(os.path.join(out_dir, '{}_original_noise0.{}'.format(file_name, file_ext)), add_white_noise(resized))
+            write_image(os.path.join(out_dir, '{}_original_noise1.{}'.format(file_name, file_ext)), add_white_noise(resized))
             write_image(os.path.join(out_dir, '{}_reflected_noise0.{}'.format(file_name, file_ext)), add_white_noise(reflected))
             write_image(os.path.join(out_dir, '{}_reflected_noise1.{}'.format(file_name, file_ext)), add_white_noise(reflected))
+            #write_image(os.path.join(out_dir, '{}_original_noise2.{}'.format(file_name, file_ext)), add_white_noise(resized))
+            #write_image(os.path.join(out_dir, '{}_original_noise3.{}'.format(file_name, file_ext)), add_white_noise(resized))
