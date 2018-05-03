@@ -15,6 +15,10 @@ class VGGFace(object):
         if auto_setup_model:
             self._output, self._output_logits = self.model(self._images, self._drop_rate, num_classes)
 
+    @property
+    def name(self):
+        return "VGGFace_v2"
+
     @staticmethod
     def model(input, drop_rate, num_classes):
         # Preprocessing:
@@ -152,7 +156,7 @@ class VGGFace(object):
         if not os.path.exists(checkpoint_dir):
             os.makedirs(checkpoint_dir)
 
-        path = saver.save(self._sess, os.path.join(checkpoint_dir, os.path.basename(__file__)), global_step=step)
+        path = saver.save(self._sess, os.path.join(checkpoint_dir, self.name), global_step=step)
         print("Stored model at step {}".format(step))
         return path
 
@@ -233,7 +237,7 @@ class VGGFace(object):
         summary_op = tf.summary.merge([loss_summary, accuracy_summary])
 
         # Prepare paths for summaries
-        summary_dir_name = time.strftime("%Y_%m_%d_%H_%M_%S") + "-VGGFace_v2"
+        summary_dir_name = time.strftime("%Y_%m_%d_%H_%M_%S") + "-" + self.name
         training_summary_dir = os.path.join(summary_dir, summary_dir_name, "training")
         validation_summary_dir = os.path.join(summary_dir, summary_dir_name, "validation")
         # Create two different summary writers to give statistics on training and validation images
