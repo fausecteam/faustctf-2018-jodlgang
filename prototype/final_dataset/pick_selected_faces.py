@@ -35,6 +35,7 @@ parser.add_argument('out_dir')
 parser.add_argument('-n', '--number_of_pictures_per', type=int, default=20)
 parser.add_argument('-o', '--output_shape', default='224x224')
 parser.add_argument('-v', '--validation-split', default=0.2)
+parser.add_argument('-r', '--reflect', action='store_true')
 args = parser.parse_args()
 
 output_shape = tuple(map(int, args.output_shape.split('x')))
@@ -72,7 +73,9 @@ for category in os.listdir(args.dataset_directory):
 
             write_image(os.path.join(out_dir, '{}_original_noise0.{}'.format(file_name, file_ext)), add_white_noise(resized))
             write_image(os.path.join(out_dir, '{}_original_noise1.{}'.format(file_name, file_ext)), add_white_noise(resized))
-            write_image(os.path.join(out_dir, '{}_reflected_noise0.{}'.format(file_name, file_ext)), add_white_noise(reflected))
-            write_image(os.path.join(out_dir, '{}_reflected_noise1.{}'.format(file_name, file_ext)), add_white_noise(reflected))
-            #write_image(os.path.join(out_dir, '{}_original_noise2.{}'.format(file_name, file_ext)), add_white_noise(resized))
-            #write_image(os.path.join(out_dir, '{}_original_noise3.{}'.format(file_name, file_ext)), add_white_noise(resized))
+            if args.reflect:
+                write_image(os.path.join(out_dir, '{}_reflected_noise0.{}'.format(file_name, file_ext)), add_white_noise(reflected))
+                write_image(os.path.join(out_dir, '{}_reflected_noise1.{}'.format(file_name, file_ext)), add_white_noise(reflected))
+            else:
+                write_image(os.path.join(out_dir, '{}_original_noise2.{}'.format(file_name, file_ext)), add_white_noise(resized))
+                write_image(os.path.join(out_dir, '{}_original_noise3.{}'.format(file_name, file_ext)), add_white_noise(resized))
