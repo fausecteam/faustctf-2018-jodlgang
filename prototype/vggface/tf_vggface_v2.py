@@ -290,12 +290,12 @@ class VGGFace(object):
         while patience > 0:
             # Fetch batch
             image_batch, label_batch = self._sess.run(next_element, feed_dict={handle: training_handle})
-            feed_dict = {self._images: image_batch, labels: label_batch, self._drop_rate: 0.5}
+            feed_dict = {self._images: image_batch, labels: label_batch, self._drop_rate: 0.8}
             _, loss_val, global_step_val = self._sess.run([train_op, loss, global_step], feed_dict=feed_dict)
 
             if global_step_val % num_steps_to_check_loss == 0:
                 print("Step: {:d}, Loss: {:3.2f}, Patience: {:d}".format(global_step_val, loss_val, patience))
-                feed_dict = {self._images: image_batch, labels: label_batch, self._drop_rate: 0}
+                feed_dict = {self._images: image_batch, labels: label_batch, self._drop_rate: 0.0}
                 summary_val = self._sess.run(summary_op, feed_dict=feed_dict)
                 # Write summary
                 training_summary_writer.add_summary(summary_val, global_step=global_step_val)
