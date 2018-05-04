@@ -4,6 +4,7 @@ import numpy as np
 import time
 import h5py
 import os
+import re
 
 
 class VGGFace(object):
@@ -170,6 +171,33 @@ class VGGFace(object):
 
         return image, label
 
+    @staticmethod
+    def variable_summaries(var_variable, gradient):
+        match = re.search("/([a-z0-9_]+):", var_variable.name)
+        if not match:
+            return []
+
+        var_name = match.group(1)
+        with tf.name_scope("{}_summary".format(var_name)):
+            mean = tf.reduce_mean(var_variable)
+            mean_summary = tf.summary.scalar("mean", mean)
+            with tf.name_scope("stddev"):
+                stddev = tf.sqrt(tf.reduce_mean(tf.square(var_variable - mean)))
+            stddev_summary = tf.summary.scalar("stddev", stddev)
+            max_summary = tf.summary.scalar("max", tf.reduce_max(var_variable))
+            min_summary = tf.summary.scalar("min", tf.reduce_min(var_variable))
+            histogram_summary = tf.summary.histogram("histogram", var_variable)
+
+            summaries = [mean_summary, stddev_summary, max_summary, min_summary, histogram_summary]
+
+            if gradient is not None:
+                grad_hist_summary = tf.summary.histogram("gradient", gradient)
+                sparsity_summary = tf.summary.scalar("gradient_sparsity", tf.nn.zero_fraction(gradient))
+                summaries.append(grad_hist_summary)
+                summaries.append(sparsity_summary)
+
+            return summaries
+
     def train(self, training_tfrecords_file, validation_tfrecords_file, learning_rate, checkpoint_dir, summary_dir, vggface_trained_weights=None):
         assert os.path.exists(training_tfrecords_file), "training set file does not exist"
         assert os.path.exists(validation_tfrecords_file), "validation set file does not exist"
@@ -216,7 +244,8 @@ class VGGFace(object):
         with tf.name_scope("optimizer"):
             global_step = tf.Variable(0, name="global_step", trainable=False)
             optimizer = tf.train.AdamOptimizer(learning_rate)
-            train_op = optimizer.minimize(loss, global_step=global_step)
+            grads_and_vars = optimizer.compute_gradients(loss)
+            train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
 
         # Checkpoint saver
         saver = tf.train.Saver(max_to_keep=1, save_relative_paths=True)
@@ -224,7 +253,13 @@ class VGGFace(object):
         # Summary
         loss_summary = tf.summary.scalar("loss", loss)
         accuracy_summary = tf.summary.scalar("accuracy", tf.reduce_mean(accuracy))
-        summary_op = tf.summary.merge([loss_summary, accuracy_summary])
+        grads_for_vars = {var_variable: grad for grad, var_variable in grads_and_vars}
+        variable_summaries = []
+        for var_variable in tf.trainable_variables():
+            gradient = grads_for_vars[var_variable]
+            variable_summaries.extend(self.variable_summaries(var_variable, gradient))
+
+        summary_op = tf.summary.merge([loss_summary, accuracy_summary] + variable_summaries)
 
         # Prepare paths for summaries
         summary_dir_name = time.strftime("%Y_%m_%d_%H_%M_%S") + "-" + self.name
