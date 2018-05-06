@@ -49,7 +49,7 @@ class VGGFace(object):
 
         fc6 = FullyConnectedLayer(7 * 7 * 512, 4096, RectifiedLinearUnit(), TruncatedNormalInitializer(mean=0, stddev=1e-2), ConstantInitializer(0))
         fc7 = FullyConnectedLayer(4096, 4096, RectifiedLinearUnit(), TruncatedNormalInitializer(mean=0, stddev=1e-2), ConstantInitializer(0))
-        fc8 = FullyConnectedLayer(4096, 2622, Softmax(), TruncatedNormalInitializer(mean=0, stddev=1e-2), ConstantInitializer(0))
+        fc8 = FullyConnectedLayer(4096, 530, Softmax(), TruncatedNormalInitializer(mean=0, stddev=1e-2), ConstantInitializer(0))
 
         self._layers = OrderedDict([
             ("conv1_1", conv1_1),
@@ -75,7 +75,7 @@ class VGGFace(object):
             ("fc8", fc8),
         ])
 
-    def restore_weights(self, weights_file):
+    def restore_weights_old(self, weights_file):
         with h5py.File(weights_file, "r") as f:
             layers = list(f.keys())
             for layer in layers:
@@ -94,6 +94,21 @@ class VGGFace(object):
                         self._layers[layer].weights = trained_value
                     else:
                         raise ValueError("Unknown key")
+
+    def restore_weights(self, weights_file):
+        with h5py.File(weights_file, "r") as f:
+            all_datasets = list(f.keys())
+            for dataset_name in all_datasets:
+                layer = self._layers[dataset_name]
+                dataset = f[dataset_name]
+
+                for key in list(dataset.keys()):
+                    if "weights" in key:
+                        layer.weights = dataset[key].value
+                    elif "bias" in key:
+                        layer.bias = dataset[key].value
+                    else:
+                        raise ValueError("Key not known")
 
     @staticmethod
     def preprocess(images):
@@ -131,13 +146,17 @@ class VGGFace(object):
 if __name__ == "__main__":
     from scipy.misc import imread
 
-    weights_file = "/home/explicat/.keras/models/vggface/rcmalli_vggface_tf_vgg16.h5"
+    weights_file = "weights_pretrained_530_lr_0.000001.h5"
     cnn = VGGFace()
     cnn.restore_weights(weights_file)
 
-    img_filename = "../keras-vggface/image/ajb.jpg"
-    img = imread(img_filename).astype(np.float)
-    # img = tf.keras.preprocessing.image.load_img("../keras-vggface/image/ajb.jpg", target_size=(224, 224))
-    # x = tf.keras.preprocessing.image.img_to_array(img)
-
-    predictions = cnn.inference(img[None, :])
+    # weights_file = "/home/explicat/.keras/models/vggface/rcmalli_vggface_tf_vgg16.h5"
+    # cnn = VGGFace()
+    # cnn.restore_weights(weights_file)
+    #
+    # img_filename = "../keras-vggface/image/ajb.jpg"
+    # img = imread(img_filename).astype(np.float)
+    # # img = tf.keras.preprocessing.image.load_img("../keras-vggface/image/ajb.jpg", target_size=(224, 224))
+    # # x = tf.keras.preprocessing.image.img_to_array(img)
+    #
+    # predictions = cnn.inference(img[None, :])
