@@ -5,3 +5,4 @@ Pillow
 imageio
 django
 django-widget-tweaks
+h5py
