@@ -1,0 +1,9 @@
+name: JODLGANG
+slug: jodlgang
+author:
+  - Bene <benedikt.lorch@fau.de>
+  - Lukas <lukasdresel@ucsb.edu>
+
+install:
+  debian_packages:
+    - python3-dev
