@@ -12,8 +12,9 @@ build_job:
     - cp requirements.txt dist_root/srv/jodlgang/
     - dist_root/srv/jodlgang/jodlenv/bin/pip install -r requirements.txt
   artifacts:
-    - metadata.yml
-    - dist_root/
+    paths:
+      - metadata.yml
+      - dist_root/
   only:
     - master
   tags:
