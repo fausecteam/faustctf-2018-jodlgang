@@ -1,5 +1,7 @@
 numpy
 scikit-image
+scipy
+Pillow
 imageio
 django
 django-widget-tweaks
