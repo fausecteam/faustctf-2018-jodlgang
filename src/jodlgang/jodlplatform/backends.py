@@ -18,7 +18,7 @@ class FaceAuthenticationBackend(object):
         try:
             user = User.objects.get(email=kwargs["username"])
         except User.DoesNotExist:
-            return PermissionDenied
+            raise PermissionDenied
 
         try:
             face_img = np.array(Image.open(kwargs["face_img"])).astype(np.float)
@@ -33,7 +33,7 @@ class FaceAuthenticationBackend(object):
                 return user
         except Exception as e:
             logger.error("Exception in face recognition: " + str(e))
-            return PermissionDenied
+            raise PermissionDenied
 
     def get_user(self, user_id):
         try:
