@@ -1,3 +1,4 @@
+wheel
 numpy
 scikit-image
 scipy
@@ -6,3 +7,4 @@ imageio
 django
 django-widget-tweaks
 h5py
+uwsgi
