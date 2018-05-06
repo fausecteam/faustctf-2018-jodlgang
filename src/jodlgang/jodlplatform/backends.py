@@ -2,7 +2,6 @@ from .utils import get_face_recognition_cnn
 from .models import User
 from PIL import Image
 import numpy as np
-import os
 
 
 class FaceAuthenticationBackend(object):
@@ -18,11 +17,15 @@ class FaceAuthenticationBackend(object):
             cnn = get_face_recognition_cnn()
             class_probabilities = cnn.inference(face_img[None, :])[0]
 
-            if user.check_password(kwargs["password"]):
-                return user
-            else:
+            most_likely_class = np.argmax(class_probabilities)
+            if class_probabilities[most_likely_class] <= 0.5:
+                # TODO deny access immediately
                 return None
+
+            if user.id == most_likely_class:
+                return user
         except User.DoesNotExist:
+            # TODO deny access
             return None
 
     def get_user(self, user_id):
