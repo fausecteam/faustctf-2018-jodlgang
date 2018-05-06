@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import tensorflow as tf
+import numpy as np
 import argparse
 
 
@@ -16,7 +17,8 @@ def _parse_function(proto):
 
     with tf.name_scope("decode_jpeg", [image_buffer], None):
         image = tf.image.decode_jpeg(image_buffer, channels=3)
-        image = tf.image.convert_image_dtype(image, dtype=tf.float32)
+        #image = tf.image.convert_image_dtype(image, dtype=tf.float32)
+        image = tf.cast(image, tf.float32)
 
     image = tf.reshape(image, [224, 224, 3])
 
@@ -61,7 +63,7 @@ def load_dataset(training_tfrecords_file, validation_tfrecords_file):
 
                     for j in range(6):
                         plt.subplot(2, 3, j + 1)
-                        plt.imshow(image_batch[j, ...])
+                        plt.imshow(image_batch[j, ...].astype(np.uint8))
                         plt.title(label_batch[j])
                     plt.show()
 
