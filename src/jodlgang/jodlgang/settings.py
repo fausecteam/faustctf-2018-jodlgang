@@ -136,3 +136,5 @@ UPLOAD_TEMP_DIR = [
 ]
 
 CNN_WEIGHTS = "cnn_weights.h5"
+
+TEAM_ID = 3

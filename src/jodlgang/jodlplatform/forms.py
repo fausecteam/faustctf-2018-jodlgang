@@ -14,9 +14,7 @@ class FaceAuthenticationForm(forms.Form):
         widget=forms.TextInput(attrs={'autofocus': True}),
     )
 
-    pet = forms.CharField(label="Pet", max_length=30, widget=forms.TextInput(attrs={'class': 'loginput'}))
-
-    face_img = forms.ImageField(label="Face image")
+    face_img = forms.ImageField(label="Face image", required=True)
 
     error_messages = {
         'invalid_login': _(

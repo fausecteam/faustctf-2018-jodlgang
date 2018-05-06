@@ -29,20 +29,20 @@
             <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
         </div>
 
-
-        {{ form.username.label_tag }}
-        {% render_field form.username class="form-control" %}
+        <div class="form-group">
+            {{ form.username.label_tag }}
+            {% render_field form.username class="form-control" %}
+        </div>
 
         <!--
         {{ form.password.label_tag }}
         {% render_field form.password class="form-control" %}
         -->
 
-        {{ form.pet.label_tag }}
-        {% render_field form.pet class="form-control" %}
-
-        {{ form.face_image.label_tag }}
-        {% render_field form.face_img class="form-control" %}
+        <div class="form-group">
+            <label for="id_face_img">A webcam photo of your face:</label>
+            {% render_field form.face_img class="form-control" %}
+        </div>
 
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
     </form>

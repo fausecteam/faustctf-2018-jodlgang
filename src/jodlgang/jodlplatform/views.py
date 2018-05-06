@@ -1,10 +1,20 @@
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.conf import settings
+from .models import User
 
 
 def index(request):
-    return render(request, "home.html")
+    team_id = getattr(settings, "TEAM_ID", None)
+    user = User.objects.get(id=team_id)
+    # TODO what if user does not exist?
+
+    context = {
+        "name": user.name,
+        "email": user.email
+    }
+    return render(request, "home.html", context=context)
 
 
 def my_view(request):
