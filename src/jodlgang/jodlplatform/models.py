@@ -4,10 +4,10 @@ from .managers import UserManager
 
 
 class User(AbstractBaseUser):
-    id = models.AutoField('id', primary_key=True, blank=True)
+    id = models.AutoField('id', primary_key=True, blank=False)
     email = models.EmailField('email address', blank=False, unique=True, null=False)
     name = models.CharField('name', max_length=100, blank=True)
-    is_staff = models.BooleanField('staff', default=True)
+    is_staff = models.BooleanField('staff', default=False)
 
     objects = UserManager()
 

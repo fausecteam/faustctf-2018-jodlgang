@@ -107,7 +107,7 @@ AUTHENTICATION_BACKENDS = (
 'jodlplatform.backends.FaceAuthenticationBackend', 'django.contrib.auth.backends.ModelBackend')
 
 # Redirect to home URL after login
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'home'
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
@@ -130,3 +130,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
+
+UPLOAD_TEMP_DIR = [
+    os.path.join(BASE_DIR, "upload")
+]
+
+CNN_WEIGHTS = "cnn_weights.h5"

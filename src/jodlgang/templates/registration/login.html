@@ -22,18 +22,27 @@
         {% endif %}
     {% endif %}
 
-    <form class="form-signin" method="post" action="{% url 'login' %}">
+    <form class="form-signin" method="post" action="{% url 'login' %}" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="text-center">
             <img class="mb-4" src="https://getbootstrap.com/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
             <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
         </div>
 
+
         {{ form.username.label_tag }}
         {% render_field form.username class="form-control" %}
 
+        <!--
         {{ form.password.label_tag }}
         {% render_field form.password class="form-control" %}
+        -->
+
+        {{ form.pet.label_tag }}
+        {% render_field form.pet class="form-control" %}
+
+        {{ form.face_image.label_tag }}
+        {% render_field form.face_img class="form-control" %}
 
         <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
     </form>
