@@ -108,6 +108,16 @@ class VGGFace(object):
                         sess.run(tf.assign(tf_variable, trained_value))
         return True
 
+    def dump_weights_to_hdf5(self, hdf5_output_file):
+        with h5py.File(hdf5_output_file, "w") as f:
+            for v in tf.trainable_variables():
+                data = self._sess.run(v)
+                name = re.sub(":[0-9]+", "", v.name)
+                shape = data.shape
+                dtype = data.dtype
+                dataset = f.create_dataset(name, shape=shape, dtype=dtype, compression="gzip")
+                dataset[:] = data
+
     def inference(self, imgs):
         predictions = self._sess.run(self._output, feed_dict={self._images: imgs, self._drop_rate: 0})
         return predictions
@@ -130,11 +140,14 @@ class VGGFace(object):
         original_imgs = original_imgs[..., ::-1]
         return original_imgs
 
-    def load(self, checkpoint_dir, saver):
+    def load(self, checkpoint_dir, saver=None):
         print("Attempting to read checkpoint from {}".format(checkpoint_dir))
 
         checkpoint = tf.train.get_checkpoint_state(checkpoint_dir)
         if checkpoint and checkpoint.model_checkpoint_path:
+            if not saver:
+                saver = tf.train.Saver(max_to_keep=1, save_relative_paths=True)
+
             saver.restore(self._sess, checkpoint.model_checkpoint_path)
             print("Successfully restored checkpoint")
             return True
