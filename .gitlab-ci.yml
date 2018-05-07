@@ -5,8 +5,15 @@ build_job:
   stage: build
   image: "debian:stretch"
   before_script:
-    - apt-get -y install python3 python3-venv python3-dev # Make sure Python3 is installed
-    - apt-get -y install nginx
+    - mkdir -p "$CI_PROJECT_DIR/.apt" "$CI_PROJECT_DIR/.pip"
+    - echo 'deb http://ftp.debian.org/debian stretch-backports main' >> /etc/apt/sources.list
+    - apt -o dir::cache="$CI_PROJECT_DIR/.apt" -yqq update
+    - apt -o dir::cache="$CI_PROJECT_DIR/.apt" -yqq install python3 python3-venv python3-dev
+    - apt -o dir::cache="$CI_PROJECT_DIR/.apt" -yqq install  install nginx
+  cache:
+    paths:
+      - .apt/
+      - .pip/
   script:
     - python3 -m venv dist_root/srv/jodlgang/jodlenv
     - dist_root/srv/jodlgang/jodlenv/bin/pip install -r requirements.txt
