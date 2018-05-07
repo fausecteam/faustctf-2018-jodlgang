@@ -44,7 +44,8 @@ class User(AbstractBaseUser):
 
 
 class Note(models.Model):
-    text = models.CharField(max_length=512)
+    text = models.CharField(max_length=512, blank=False)
+    title = models.CharField(max_length=128, blank=False)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     public = models.BooleanField(default=True)
     pub_date = models.DateTimeField(auto_now_add=True, blank=False)

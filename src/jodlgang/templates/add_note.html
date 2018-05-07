@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}
+    <title>Add note - JODL GANG</title>
+{% endblock %}
+
+{% block content %}
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h1 class="display-5">Share your advice!</h1>
+
+        <form method="post" style="max-width: 500px; padding: 15px; margin: auto;">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" class="form-control" required/>
+            </div>
+
+            <div class="form-group">
+                <textarea class="form-control" id="noteTextarea" name="note" rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="public" value="on" id="isPublic" checked="checked">
+                    <label class="form-check-label" for="isPublic">
+                        Public
+                    </label>
+                </div>
+            </div>
+
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Share</button>
+
+            <a class="btn btn-outline-primary" href="/platform/home/" style="width: 100%; margin-top: 30px;">Back</a>
+        </form>
+    </div>
+
+    <div class="container">
+        <footer class="pt-4 my-md-5 pt-md-5 border-top">
+            <div class="row">
+                Contact our local ambassador&nbsp;<a href="mailto:{{ email }}"
+                                                     title="Message {{ email }}">{{ name }}</a>
+            </div>
+        </footer>
+    </div>
+{% endblock %}

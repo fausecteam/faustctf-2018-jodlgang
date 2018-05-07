@@ -11,21 +11,28 @@
         <h1 class="display-5">Overcome the fear of missing out and be a part of the movement!</h1>
         <p class="lead">The cyptocurrencies market is extremely volatile at the moment. Publish your advice and pump and
             dump with the other patrons.</p>
-        <p><a class="btn btn-primary btn-lg" href="/platform/note" role="button">Share your advice &raquo;</a></p>
+        <p>
+            <a class="btn btn-primary btn-lg" href="/platform/note/" role="button">Share your advice &raquo;</a>
+            &nbsp;
+            {% if request.get_full_path == "/platform/home/" %}
+                <a class="btn btn-primary btn-lg" href="/platform/personal/" role="button">View your notes only &raquo;</a>
+            {% else %}
+                <a class="btn btn-primary btn-lg" href="/platform/home/" role="button">View recent notes &raquo;</a>
+            {% endif %}
+        </p>
     </div>
 
     <div class="container">
         <!-- Latest notes go here -->
         <div class="list-group">
             {% for note in notes %}
-                <a href="#" class="list-group-item list-group-item-action flex-column align-items-start active">
+                <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
                     <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">List group item heading</h5>
-                        <small>3 days ago</small>
+                        <h5 class="mb-1">{{ note.title }}</h5>
+                        <small>{{ note.pub_date }}</small>
                     </div>
-                    <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus
-                        varius blandit.</p>
-                    <small>Donec id elit non mi porta.</small>
+                    <p class="mb-1">{{ note.text }}</p>
+                    <small>{{ note.author.name }}</small>
                 </a>
             {% endfor %}
         </div>
