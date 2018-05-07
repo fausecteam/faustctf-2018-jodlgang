@@ -9,7 +9,6 @@ build_job:
     - apt-get -y install nginx
   script:
     - python3 -m venv dist_root/srv/jodlgang/jodlenv
-    - cp requirements.txt dist_root/srv/jodlgang/
     - dist_root/srv/jodlgang/jodlenv/bin/pip install -r requirements.txt
   artifacts:
     paths:
