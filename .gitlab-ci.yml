@@ -16,7 +16,8 @@ build_job:
       - .pip/
   script:
     - python3 -m venv dist_root/srv/jodlgang/jodlenv
-    - dist_root/srv/jodlgang/jodlenv/bin/pip3 install -r requirements.txt
+    - dist_root/srv/jodlgang/jodlenv/bin/pip install wheel
+    - dist_root/srv/jodlgang/jodlenv/bin/pip install -r requirements.txt
   artifacts:
     paths:
       - metadata.yml
