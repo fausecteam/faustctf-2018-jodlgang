@@ -9,7 +9,7 @@ import numpy as np
 def tree(): return defaultdict(tree)
 
 
-class OurDataset(object):
+class CelebDataset(object):
     def __init__(self, directory, seed=None):
         old_np_random_state = np.random.get_state()
         old_random_state = random.getstate()
