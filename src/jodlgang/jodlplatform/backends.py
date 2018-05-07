@@ -21,8 +21,11 @@ class FaceAuthenticationBackend(object):
             raise PermissionDenied
 
         try:
-            face_img = np.array(Image.open(kwargs["face_img"])).astype(np.float)
+            logger.debug("Retrieving face recognition CNN")
             cnn = get_face_recognition_cnn()
+            logger.debug("Converting image to numpy array")
+            face_img = np.array(Image.open(kwargs["face_img"])).astype(np.float)
+            logger.debug("Running inference")
             class_probabilities = cnn.inference(face_img[None, :])[0]
             # TODO special handling for numpy exceptions
             most_likely_class = np.argmax(class_probabilities)
@@ -32,7 +35,7 @@ class FaceAuthenticationBackend(object):
             if user.id == most_likely_class:
                 return user
         except Exception as e:
-            logger.error("Exception in face recognition: " + str(e))
+            logger.error("Exception in face recognition: {} ({})".format(str(e), type(e)))
             raise PermissionDenied
 
     def get_user(self, user_id):

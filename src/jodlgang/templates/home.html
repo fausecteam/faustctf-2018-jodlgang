@@ -8,18 +8,32 @@
 
 {% block content %}
     <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-        <h1 class="display-4">Jodlgang</h1>
-        <p class="lead">We are experts on cryptocurrencies. Give us your money and we will invest it faithfully for you!</p>
+        <h1 class="display-5">Overcome the fear of missing out and be a part of the movement!</h1>
+        <p class="lead">The cyptocurrencies market is extremely volatile at the moment. Publish your advice and pump and
+            dump with the other patrons.</p>
+        <p><a class="btn btn-primary btn-lg" href="/platform/note" role="button">Share your advice &raquo;</a></p>
     </div>
 
     <div class="container">
-        <div class="card-deck mb-3 text-center">
-
+        <!-- Latest notes go here -->
+        <div class="list-group">
+            {% for note in notes %}
+                <a href="#" class="list-group-item list-group-item-action flex-column align-items-start active">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">List group item heading</h5>
+                        <small>3 days ago</small>
+                    </div>
+                    <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus
+                        varius blandit.</p>
+                    <small>Donec id elit non mi porta.</small>
+                </a>
+            {% endfor %}
         </div>
 
         <footer class="pt-4 my-md-5 pt-md-5 border-top">
             <div class="row">
-                Contact our local ambassador&nbsp;<a href="mailto:{{ email }}" title="Message {{ email }}">{{ name }}</a>
+                Contact our local ambassador&nbsp;<a href="mailto:{{ email }}"
+                                                     title="Message {{ email }}">{{ name }}</a>
             </div>
         </footer>
     </div>

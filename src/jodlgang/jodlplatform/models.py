@@ -41,3 +41,10 @@ class User(AbstractBaseUser):
     # this method is required to login super user from admin panel
     def has_module_perms(self, app_label):
         return self.is_staff
+
+
+class Note(models.Model):
+    text = models.CharField(max_length=512)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    public = models.BooleanField(default=True)
+    pub_date = models.DateTimeField(auto_now_add=True, blank=False)

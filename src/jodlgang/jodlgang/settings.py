@@ -25,7 +25,7 @@ SECRET_KEY = 'stn!6mot3v7czj+ifxxzrh*6nw#b9h1(%t&u)rst%#54ci+*$a'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -108,7 +108,7 @@ AUTHENTICATION_BACKENDS = (
 
 # Redirect to home URL after login
 LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'index'
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
@@ -131,11 +131,29 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
-
-UPLOAD_TEMP_DIR = [
-    os.path.join(BASE_DIR, "upload")
-]
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = os.path.join(PROJECT_DIR, "static")
 
 CNN_WEIGHTS = "cnn_weights.h5"
 
 TEAM_ID = 3
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+        },
+    },
+    'loggers': {
+        'jodlplatform': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

@@ -1,8 +1,10 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseRedirect
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.conf import settings
-from .models import User
+from .models import User, Note
 
 
 def index(request):
@@ -14,7 +16,48 @@ def index(request):
         "name": user.name,
         "email": user.email
     }
+    return render(request, "index.html", context=context)
+
+
+@login_required(login_url="/platform/login/")
+def home(request):
+    team_id = getattr(settings, "TEAM_ID", None)
+    user = User.objects.get(id=team_id)
+    # TODO what if user does not exist?
+
+    # Get the latest notes
+    # TODO get all notes of user currently logged in
+    latest_notes = Note.objects.filter().order_by("-pub_date")[:30]
+
+    context = {
+        "name": user.name,
+        "email": user.email,
+        "notes": latest_notes
+    }
+
     return render(request, "home.html", context=context)
+
+
+@login_required(login_url="/platform/login/")
+def add_note(request):
+    team_id = getattr(settings, "TEAM_ID", None)
+    ambassador_user = User.objects.get(id=team_id)
+    # TODO what if user does not exist?
+
+    context = {
+        "name": ambassador_user.name,
+        "email": ambassador_user.email
+    }
+
+    current_user = request.user
+    if "note" in request.POST:
+        public = "public" in request.POST
+        note = request.POST
+        if len(note) > 0:
+            Note(author=current_user, text=note, public=public).save()
+            return HttpResponseRedirect("/platform/home/")
+
+    return render(request, "add_note.html", context=context)
 
 
 def my_view(request):
@@ -28,8 +71,3 @@ def my_view(request):
     else:
         # Return to invalid login error message
         return render(request, "registration/login.html")
-
-
-def logout_view(request):
-    logout(request)
-    return render(request, "registration/logged_out.html")
