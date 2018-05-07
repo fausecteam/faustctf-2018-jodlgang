@@ -9,7 +9,7 @@ build_job:
     - echo 'deb http://ftp.debian.org/debian stretch-backports main' >> /etc/apt/sources.list
     - apt -o dir::cache="$CI_PROJECT_DIR/.apt" -yqq update
     - apt -o dir::cache="$CI_PROJECT_DIR/.apt" -yqq install python3 python3-venv python3-dev
-    - apt -o dir::cache="$CI_PROJECT_DIR/.apt" -yqq install  install nginx
+    - apt -o dir::cache="$CI_PROJECT_DIR/.apt" -yqq install nginx
   cache:
     paths:
       - .apt/
