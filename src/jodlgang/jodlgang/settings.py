@@ -134,7 +134,7 @@ STATICFILES_DIRS = [
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_DIR, "static")
 
-CNN_WEIGHTS = "cnn_weights.h5"
+CNN_WEIGHTS = os.path.abspath("cnn_weights.h5")
 
 TEAM_ID = 3
 

@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class FaceAuthenticationBackend(object):
     def authenticate(self, request, **kwargs):
-        if "face_img" not in kwargs:
+        if 'face_img' not in request.FILES:
             raise PermissionDenied
 
         # Check the token and return the user
@@ -24,18 +24,20 @@ class FaceAuthenticationBackend(object):
             logger.debug("Retrieving face recognition CNN")
             cnn = get_face_recognition_cnn()
             logger.debug("Converting image to numpy array")
-            face_img = np.array(Image.open(kwargs["face_img"])).astype(np.float)
+            face_img = np.array(Image.open(request.FILES['face_img'])).astype(np.float)
             logger.debug("Running inference")
             class_probabilities = cnn.inference(face_img[None, :])[0]
+
             # TODO special handling for numpy exceptions
             most_likely_class = np.argmax(class_probabilities)
-            if class_probabilities[most_likely_class] <= 0.5:
-                raise PermissionDenied
 
-            if user.id == most_likely_class:
-                return user
+            if class_probabilities[most_likely_class] <= 0.5 or user.id != most_likely_class:
+                raise PermissionDenied
+            return user
+
         except Exception as e:
             logger.error("Exception in face recognition: {} ({})".format(str(e), type(e)))
+            # TODO: remove this for the softmax overflow vuln!
             raise PermissionDenied
 
     def get_user(self, user_id):

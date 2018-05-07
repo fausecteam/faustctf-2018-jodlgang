@@ -5,28 +5,14 @@ import os
 
 import shutil
 
-import ipdb
 import numpy as np
-from skimage import img_as_ubyte
 from skimage.transform import resize
-from skimage.io import imread
 import argparse
+from .image_manipulation import add_white_noise, write_image, reflect_image
 
-from skimage.util import random_noise
 
 random.seed(0)
 np.random.seed(0)
-
-
-def write_image(path, img):
-    shutil._ensure_directory(path)
-    imageio.imwrite(path, img)
-
-def add_white_noise(img):
-    return img_as_ubyte(random_noise(img))
-
-def reflect_image(img):
-    return img[:, ::-1]
 
 
 parser = argparse.ArgumentParser()

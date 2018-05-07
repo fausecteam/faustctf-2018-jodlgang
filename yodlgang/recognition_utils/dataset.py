@@ -3,8 +3,8 @@ import random
 
 from collections import defaultdict
 
-import imageio
 import numpy as np
+
 
 def tree(): return defaultdict(tree)
 
@@ -17,7 +17,6 @@ class OurDataset(object):
         if seed is not None:
             np.random.seed(seed)
             random.seed(seed)
-
 
         self.dataset_directory = directory
         self.data = tree()
