@@ -2,7 +2,7 @@ import os
 from setuptools import setup
 
 setup(
-    name='yodlgang',
+    name='jodlgang',
     version='3.1.3.3.7',
-    packages=['yodlgang.recognition_utils', 'prototype', 'client',]
+    packages=['jodlgang.recognition_utils', 'jodlgang.tensorwow', 'jodlgang.client']
 )
