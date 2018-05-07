@@ -16,8 +16,9 @@ class FullyConnectedLayer(object):
         self._num_output_units = num_output_units
         self._activation_func = activation_func
 
-        self._weights = weights_initializer.initialize((num_input_units, num_output_units))
-        self._bias = bias_initializer.initialize((num_output_units))
+        # Disable default initialization
+        # self._weights = weights_initializer.initialize((num_input_units, num_output_units))
+        # self._bias = bias_initializer.initialize((num_output_units))
 
         self._x = None
         self._z = None
@@ -90,8 +91,9 @@ class ConvLayer(object):
         self._stride = stride
         self._activation_func = activation_func
 
-        self._weights = weights_initializer.initialize((kernel_size, kernel_size, num_input_channels, num_filters))
-        self._bias = bias_initializer.initialize((num_filters, 1))
+        # Disable default initialization
+        # self._weights = weights_initializer.initialize((kernel_size, kernel_size, num_input_channels, num_filters))
+        # self._bias = bias_initializer.initialize((num_filters, 1))
 
     @property
     def weights(self):
@@ -148,7 +150,6 @@ class ConvLayer(object):
         a = a.reshape(self._num_filters, num_samples, output_height, output_width).transpose(1, 2, 3, 0)
 
         return a
-
 
 
 class MaxPoolLayer(object):
