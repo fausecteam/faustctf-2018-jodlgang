@@ -19,7 +19,7 @@ def index(request):
     return render(request, "index.html", context=context)
 
 
-@login_required(login_url="/platform/login/")
+@login_required(login_url="/login/")
 def home(request):
     team_id = getattr(settings, "TEAM_ID", None)
     user = User.objects.get(id=team_id)
@@ -38,7 +38,7 @@ def home(request):
     return render(request, "home.html", context=context)
 
 
-@login_required(login_url="/platform/login/")
+@login_required(login_url="/login/")
 def add_note(request):
     team_id = getattr(settings, "TEAM_ID", None)
     ambassador_user = User.objects.get(id=team_id)
@@ -56,12 +56,12 @@ def add_note(request):
         title = request.POST["title"]
         if len(note) > 0 and len(title):
             Note(author=current_user, text=note, title=title, public=public).save()
-            return HttpResponseRedirect("/platform/home/")
+            return HttpResponseRedirect("/home/")
 
     return render(request, "add_note.html", context=context)
 
 
-@login_required(login_url="/platform/login/")
+@login_required(login_url="/login/")
 def personal_notes(request):
     team_id = getattr(settings, "TEAM_ID", None)
     user = User.objects.get(id=team_id)

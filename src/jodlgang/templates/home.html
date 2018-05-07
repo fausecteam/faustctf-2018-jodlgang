@@ -12,12 +12,12 @@
         <p class="lead">The cyptocurrencies market is extremely volatile at the moment. Publish your advice and pump and
             dump with the other patrons.</p>
         <p>
-            <a class="btn btn-primary btn-lg" href="/platform/note/" role="button">Share your advice &raquo;</a>
+            <a class="btn btn-primary btn-lg" href="/note/" role="button">Share your advice &raquo;</a>
             &nbsp;
-            {% if request.get_full_path == "/platform/home/" %}
-                <a class="btn btn-primary btn-lg" href="/platform/personal/" role="button">View your notes only &raquo;</a>
+            {% if request.get_full_path == "/home/" %}
+                <a class="btn btn-primary btn-lg" href="/personal/" role="button">View your notes only &raquo;</a>
             {% else %}
-                <a class="btn btn-primary btn-lg" href="/platform/home/" role="button">View recent notes &raquo;</a>
+                <a class="btn btn-primary btn-lg" href="/home/" role="button">View recent notes &raquo;</a>
             {% endif %}
         </p>
     </div>
