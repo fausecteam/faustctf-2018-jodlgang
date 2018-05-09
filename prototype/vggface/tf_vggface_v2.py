@@ -22,9 +22,16 @@ class VGGFace(object):
 
     @staticmethod
     def model(input, drop_rate, num_classes):
+        # Apply the preprocessing as part of the computational graph
+        r, g, b = tf.split(input, num_or_size_splits=3, axis=3)
+        b_normalized = tf.subtract(b, 93.5940)
+        g_normalized = tf.subtract(g, 104.7624)
+        r_normalized = tf.subtract(r, 129.1863)
+        bgr = tf.concat([b_normalized, g_normalized, r_normalized], axis=3)
+
         # Block 1
         # (224, 224, 3) -> (112, 112, 64)
-        conv1_1 = conv2d_relu(input, 64, "conv1_1")
+        conv1_1 = conv2d_relu(bgr, 64, "conv1_1")
         conv1_2 = conv2d_relu(conv1_1, 64, "conv1_2")
         pool1 = max_pool_2x2(conv1_2)
 
