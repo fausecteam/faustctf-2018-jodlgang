@@ -90,6 +90,10 @@ class JodlGangClient(object):
             self._logger.warning("Login attempt gave status code {:d}".format(resp.status_code))
             return NOTWORKING
 
+        if self._is_login_page(resp.text):
+            self._logger.warning("Login attempt was unsuccessful, forwarded to login page again")
+            return NOTWORKING
+
         self._logged_in = True
         return OK
 
