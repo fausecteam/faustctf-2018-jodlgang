@@ -6,9 +6,10 @@ import os
 import shutil
 
 import numpy as np
+from jodlgang.image_utils import add_white_noise_ubyte, reflect_image, write_image
 from skimage.transform import resize
 import argparse
-from .image_manipulation import add_white_noise, write_image, reflect_image
+
 
 
 random.seed(0)
@@ -57,11 +58,11 @@ for category in os.listdir(args.dataset_directory):
             else:
                 out_dir = os.path.join(args.out_dir, 'training', category, 'faces', celeb)
 
-            write_image(os.path.join(out_dir, '{}_original_noise0.{}'.format(file_name, file_ext)), add_white_noise(resized))
-            write_image(os.path.join(out_dir, '{}_original_noise1.{}'.format(file_name, file_ext)), add_white_noise(resized))
+            write_image(os.path.join(out_dir, '{}_original_noise0.{}'.format(file_name, file_ext)), add_white_noise_ubyte(resized))
+            write_image(os.path.join(out_dir, '{}_original_noise1.{}'.format(file_name, file_ext)), add_white_noise_ubyte(resized))
             if args.reflect:
-                write_image(os.path.join(out_dir, '{}_reflected_noise0.{}'.format(file_name, file_ext)), add_white_noise(reflected))
-                write_image(os.path.join(out_dir, '{}_reflected_noise1.{}'.format(file_name, file_ext)), add_white_noise(reflected))
+                write_image(os.path.join(out_dir, '{}_reflected_noise0.{}'.format(file_name, file_ext)), add_white_noise_ubyte(reflected))
+                write_image(os.path.join(out_dir, '{}_reflected_noise1.{}'.format(file_name, file_ext)), add_white_noise_ubyte(reflected))
             else:
-                write_image(os.path.join(out_dir, '{}_original_noise2.{}'.format(file_name, file_ext)), add_white_noise(resized))
-                write_image(os.path.join(out_dir, '{}_original_noise3.{}'.format(file_name, file_ext)), add_white_noise(resized))
+                write_image(os.path.join(out_dir, '{}_original_noise2.{}'.format(file_name, file_ext)), add_white_noise_ubyte(resized))
+                write_image(os.path.join(out_dir, '{}_original_noise3.{}'.format(file_name, file_ext)), add_white_noise_ubyte(resized))
