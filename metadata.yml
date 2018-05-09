@@ -8,8 +8,10 @@ install:
   debian_packages:
     - build-essential
     - python3-dev
-    - nginx
+    - nginx-full
     - uwsgi
+    - uwsgi-emperor
+    - uwsgi-plugin-python3
   postinst_commands:
     - ln -s /srv/jodlgang/jodlgang_nginx.conf /etc/nginx/sites-enabled/
     - chmod 751 /srv/jodlgang # Give nginx permission to traverse into static files directory
