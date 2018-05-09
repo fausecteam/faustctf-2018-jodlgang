@@ -1,3 +1,6 @@
+#!/usr/bin/python
+
+
 from ctf_gameserver.checker import BaseChecker
 from .constants import OK, NOTFOUND, NOTWORKING, TIMEOUT
 from .constants import CRYPTO_LINGO
