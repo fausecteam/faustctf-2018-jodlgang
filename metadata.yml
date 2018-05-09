@@ -9,10 +9,11 @@ install:
     - build-essential
     - python3-dev
     - nginx
+    - uwsgi
   postinst_commands:
     - ln -s /srv/jodlgang/jodlgang_nginx.conf /etc/nginx/sites-enabled/
-    - /etc/init.d/nginx restart
-    - uwsgi --ini /srv/jodlgang/jodlgang_uwsgi.ini
+    - chmod 751 /srv/jodlgang # Give nginx permission to traverse into static files directory
+    - systemctl restart nginx
 
 checker:
   module: jodlgang
