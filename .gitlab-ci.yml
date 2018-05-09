@@ -1,5 +1,6 @@
 stages:
   - build
+  - upload
 
 build_job:
   stage: build
