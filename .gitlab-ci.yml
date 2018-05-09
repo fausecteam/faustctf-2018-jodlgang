@@ -21,6 +21,7 @@ build_job:
     - dist_root/srv/jodlgang/jodlenv/bin/python src/jodlgang/manage.py collectstatic --no-input # Let Django collect its static files
     - cp webserver/nginx/jodlgang_nginx.conf dist_root/srv/jodlgang/ # Copy nginx configuration
     - cp webserver/uwsgi/jodlgang_uwsgi.ini dist_root/srv/jodlgang/ # Copy uwsgi configuration
+    - rsync -av src/jodlgang dist_root/srv/jodlgang/ --exclude "__pycache__" --exclude "migrations" --exclude "*.h5" # Copy django files
   artifacts:
     paths:
       - metadata.yml
