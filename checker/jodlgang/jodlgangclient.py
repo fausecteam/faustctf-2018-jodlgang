@@ -35,6 +35,15 @@ class JodlGangClient(object):
         """
         return self._logged_in
 
+    @staticmethod
+    def _exception_name(exception):
+        if isinstance(exception, requests.Timeout):
+            return "Timeout"
+        elif isinstance(exception, requests.ConnectionError):
+            return "Connection error"
+        else:
+            raise ValueError("Unregistered exception type")
+
     def login(self, username, face_img_path):
         """
         Uses face authentication to sign in
@@ -46,8 +55,8 @@ class JodlGangClient(object):
         # Request login page
         try:
             resp = self._s.get(self._url_base + "/login/", timeout=self._timeout)
-        except requests.Timeout:
-            self._logger.warning("Timeout while trying to load login page")
+        except (requests.Timeout, requests.ConnectTimeout) as e:
+            self._logger.warning("{} while trying to load login page".format(self._exception_name(e)))
             return TIMEOUT
 
         if resp.status_code != 200:
@@ -73,8 +82,8 @@ class JodlGangClient(object):
             files = {"face_img": f}
             try:
                 resp = self._s.post(self._url_base + "/login/", data=params, files=files, timeout=self._timeout)
-            except requests.Timeout:
-                self._logger.warning("Timeout while trying to log in")
+            except (requests.Timeout, requests.ConnectionError) as e:
+                self._logger.warning("{} while trying to log in".format(self._exception_name(e)))
                 return TIMEOUT
 
         if resp.status_code != 200:
@@ -100,8 +109,8 @@ class JodlGangClient(object):
         # Request the write note page
         try:
             resp = self._s.get(self._url_base + "/note/", timeout=self._timeout)
-        except requests.Timeout:
-            self._logger.warning("Timeout while trying to read add note page")
+        except (requests.Timeout, requests.ConnectionError) as e:
+            self._logger.warning("{} while trying to read add note page".format(self._exception_name(e)))
             return TIMEOUT
 
         if resp.status_code != 200:
@@ -122,8 +131,8 @@ class JodlGangClient(object):
 
         try:
             resp = self._s.post(self._url_base + "/note/", data=params, timeout=self._timeout)
-        except requests.Timeout:
-            self._logger.warning("Timeout while trying to post note")
+        except (requests.Timeout, requests.ConnectionError) as e:
+            self._logger.warning("{} while trying to post note".format(self._exception_name(e)))
             return TIMEOUT
 
         if resp.status_code != 200:
@@ -225,8 +234,8 @@ class JodlGangClient(object):
         # Request the public notes page
         try:
             resp = self._s.get(self._url_base + "/home/", timeout=self._timeout)
-        except requests.Timeout:
-            self._logger.warning("Timeout while trying to read public notes")
+        except (requests.Timeout, requests.ConnectionError) as e:
+            self._logger.warning("{} while trying to read public notes".format(self._exception_name(e)))
             return TIMEOUT
 
         if resp.status_code != 200:
@@ -254,8 +263,8 @@ class JodlGangClient(object):
         # Request the personal notes page
         try:
             resp = self._s.get(self._url_base + "/personal/", timeout=self._timeout)
-        except requests.Timeout:
-            self._logger.warning("Timeout while trying to read personal notes")
+        except (requests.Timeout, requests.ConnectionError) as e:
+            self._logger.warning("{} while trying to read personal notes".format(self._exception_name(e)))
             return TIMEOUT
 
         if resp.status_code != 200:
@@ -282,8 +291,8 @@ class JodlGangClient(object):
         # Attempt to log out
         try:
             resp = self._s.get(self._url_base + "/logout/", timeout=self._timeout)
-        except requests.Timeout:
-            self._logger.warning("Timeout while trying to log out")
+        except (requests.Timeout, requests.ConnectionError) as e:
+            self._logger.warning("{} while trying to log out".format(self._exception_name(e)))
             return TIMEOUT
 
         if resp.status_code != 200:
@@ -309,4 +318,4 @@ if __name__ == "__main__":
     res = client.list_public_notes()
     res = client.list_personal_notes()
     res = client.log_out()
-    res = client.list_public_notes()
+    # res = client.list_public_notes()
