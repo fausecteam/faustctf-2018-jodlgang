@@ -1,6 +1,20 @@
 import numpy as np
 
 
+cache = dict()
+
+
+def get_im2col_indices_with_cache(x_shape, field_height, field_width, padding, stride):
+    key = (x_shape, field_height, field_width, padding, stride)
+    if key in cache:
+        print("Reusing cached indices")
+        return cache[key]
+
+    indices = get_im2col_indices(x_shape, field_height, field_width, padding, stride)
+    cache[key] = indices
+    return indices
+
+
 def get_im2col_indices(x_shape, field_height, field_width, padding=1, stride=1):
     # First figure out what the size of the output should be
     N, H, W, C = x_shape
@@ -32,7 +46,7 @@ def im2col_indices(x, field_height, field_width, padding=1, stride=1):
 
     # Compute indices in input image x, taking padding and stride into account.
     # k will be the channels to slice, and i and j will be the spatial position
-    k, i, j = get_im2col_indices(x.shape, field_height, field_width, padding, stride)
+    k, i, j = get_im2col_indices_with_cache(x.shape, field_height, field_width, padding, stride)
 
     # Obtain values at index positions
     cols = x_padded[:, i, j, k]
