@@ -2,6 +2,7 @@ import argparse
 import json
 import re
 import os
+import time
 import shutil
 from collections import defaultdict
 
@@ -43,13 +44,14 @@ def get_face_recognition_rate(cnn, target_class, face, num_checks_to_pass=4, num
     return num_checks_passed >= num_checks_to_pass, num_checks_passed
 
 NOISY_DIR = '/media/honululu/Data/facescrub_final_directory/'
-NOISELESS_DIR = '/media/honululu/Data/facescrub_resized/'
+NOISELESS_DIR = '/media/honululu/Data/facescrub_preprocessed/'
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('weights_file')
     parser.add_argument('checker_dataset_out_dir')
     parser.add_argument('--num-checks-to-run', default=1)
+    parser.add_argument('--celebs-to-run-on', nargs='*')
     parser.add_argument('--num-checks-to-pass', default=1)
     args = parser.parse_args()
 
@@ -75,26 +77,40 @@ if __name__ == '__main__':
                     assert os.path.isfile(original_pic), "Could not find image {}".format(original_pic)
                     original_images[celeb].add(original_pic)
 
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
     print("Checking recognition rates of dataset images ... ")
     face_recognition = {}
+    checked_celebs = set(args.celebs_to_run_on) if len(args.celebs_to_run_on) > 0 else set(celebs)
     for celeb, images in original_images.items():
+        celeb_start_time = time.time()
+        celeb_out_dir = os.path.join(args.checker_dataset_out_dir, celeb)
+        if celeb not in checked_celebs:
+            continue
+
+        if os.path.isdir(celeb_out_dir):
+            print("SKIPPING, directory already exists!")
+            continue
+
         print ("Checking images for {} ...".format(celeb))
         face_recognition[celeb] = list()
         for img in images:
             face = np.array(Image.open(img))
+            img_start_time = time.time()
             passed, num_recognized = get_face_recognition_rate(cnn,
                                                        celeb_to_class_label[celeb],
                                                        face,
                                                        num_checks_to_pass=args.num_checks_to_pass,
                                                        num_checks_to_run=args.num_checks_to_run)
-            print("... {}: Passed {}, {}/{}".format(img, passed, num_recognized, args.num_checks_to_run))
+            img_end_time = time.time()
+            print("... {}: Passed {}, {}/{}, took {} seconds".format(img, passed, num_recognized, args.num_checks_to_run, img_end_time - img_start_time))
             if passed:
-                out_path = os.path.join(args.checker_dataset_out_dir, celeb, os.path.basename(img))
+                out_path = os.path.join(celeb_out_dir, os.path.basename(img))
                 write_image(out_path, face)
 
 
             face_recognition[celeb].append(dict(img=img, success=num_recognized, total=args.num_checks_to_run, passed=passed))
+        celeb_end_time = time.time()
+        print("Celebrity {} took {} seconds for a full check!".format(celeb, celeb_end_time - celeb_start_time))
 
 
     print(face_recognition)

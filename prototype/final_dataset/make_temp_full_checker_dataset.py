@@ -28,7 +28,7 @@ def get_original_img_name(n):
 
 
 NOISY_DIR = '/media/honululu/Data/facescrub_final_directory/'
-NOISELESS_DIR = '/media/honululu/Data/facescrub_resized/'
+NOISELESS_DIR = '/media/honululu/Data/facescrub_preprocessed/'
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
