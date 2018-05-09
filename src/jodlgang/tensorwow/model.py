@@ -75,6 +75,18 @@ class FaceRecognitionCNN(object):
             ("fc8", fc8),
         ])
 
+    @property
+    def input_height(self):
+        return self._input_height
+
+    @property
+    def input_width(self):
+        return self._input_width
+
+    @property
+    def input_channels(self):
+        return self._input_channels
+
     def restore_weights(self, weights_file):
         with h5py.File(weights_file, "r") as f:
             all_datasets = list(f.keys())
