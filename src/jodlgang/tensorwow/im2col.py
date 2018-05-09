@@ -7,7 +7,6 @@ cache = dict()
 def get_im2col_indices_with_cache(x_shape, field_height, field_width, padding, stride):
     key = (x_shape, field_height, field_width, padding, stride)
     if key in cache:
-        print("Reusing cached indices")
         return cache[key]
 
     indices = get_im2col_indices(x_shape, field_height, field_width, padding, stride)
