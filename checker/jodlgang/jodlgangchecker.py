@@ -6,8 +6,13 @@ from .constants import OK, NOTFOUND, NOTWORKING, TIMEOUT
 from .constants import CRYPTO_LINGO
 from .jodlgangclient import JodlGangClient
 import random
+import json
+import os
+import re
 
 
+# TODO change data dir
+DATA_DIR = "/media/explicat/Moosilauke/ctf/facescrub/checker_dataset_non_filtered"
 ERROR_CODES = [NOTFOUND, NOTWORKING, TIMEOUT]
 
 
@@ -16,20 +21,71 @@ class JodlGangChecker(BaseChecker):
         BaseChecker.__init__(self, tick, team, service, ip)
         self.client = JodlGangClient(service, ip, self.logger)
 
+        # Read class label to folder mapping
+        class_label_mapping_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "class_label_mapping.json")
+        class_label_mapping_names_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "class_label_mapping_names.json")
+
+        with open(class_label_mapping_file, "r") as f:
+            self._class_label_mapping = json.load(f)
+
+        with open(class_label_mapping_names_file, "r") as f:
+            self._class_label_mapping_names = json.load(f)
+
+    @staticmethod
+    def _replace_umlauts(input):
+        return input.replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").replace("Ä", "Ae").replace("Ö", "oe").replace("Ü", "ue").replace("ß", "ss")
+
+    def _get_user_email_address(self):
+        """
+        Constructs the user's email address based on the name of the person who is assigned to the given team (based on team id)
+        :return: The email address of the identity which is assigned to the given team
+        """
+        # Get assigned user name based on team id
+        name = self._class_label_mapping_names[self.team]
+        # Convert user name to email address
+        first_name = self._replace_umlauts(name.split(" ", 1)[0]).lower()
+        last_name = self._replace_umlauts(name.split(" ", 1)[1]).replace(" ", ".").lower()
+        email = first_name + "." + last_name + "@jodlgang.com"
+        return email
+
+    def _get_random_user_pic(self):
+        """
+        Locates one image file for the current user
+        :return: path to a face image file that shows the person assigned to the given team
+        """
+        # Find directory from where to load images
+        original_person_name = self._class_label_mapping[self.team]
+        original_person_dir = os.path.join(DATA_DIR, original_person_name)
+        if not os.path.exists(original_person_dir):
+            # If we cannot find the directory, that's an error on our side
+            self.logger.error("Directory {} (Team {:d}) could not be found".format(original_person_dir, self.team))
+            raise AssertionError()
+
+        # Find all jpg images in this directory
+        img_files = [os.path.join(dp, f) for dp, dn, filenames in os.walk(original_person_dir) for f in filenames if re.search(".(jpg|jpeg)$", f.lower()) is not None]
+        if len(img_files) == 0:
+            # If we cannot find any files, that's an error on our side
+            self.logger.error("Directory {} (Team {:d}) does not contain any jpg images".format(original_person_dir, self.team))
+            raise AssertionError()
+
+        # Randomly select one of the images files
+        return random.choice(img_files)
+
     def log_in(self, max_attempts=3):
         if self.client.logged_in:
             return OK
 
+        username = self._get_user_email_address()
         num_attempts = 0
         # If we haven't managed to log in after `max_attempts`, then we're sick of trying
         while num_attempts < max_attempts:
-            # TODO username and face image path
+            face_img_path = self._get_random_user_pic()
             status = self.client.login(username, face_img_path)
             if OK == status:
                 return status
 
             num_attempts += 1
-            self.logger.warning("Login attempt failed for team {}. Status {}. {:d} attemps left".format(self.team, status, max_attempts - num_attempts))
+            self.logger.warning("Login attempt failed for team {}. Status {}. {:d} attempts left".format(self.team, status, max_attempts - num_attempts))
 
         return status
 
