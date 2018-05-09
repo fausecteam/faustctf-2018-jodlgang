@@ -6,10 +6,18 @@ author:
 
 install:
   debian_packages:
+    - build-essential
     - python3-dev
     - nginx
-    - build-essential
   postinst_commands:
     - ln -s /srv/jodlgang/jodlgang_nginx.conf /etc/nginx/sites-enabled/
     - /etc/init.d/nginx restart
     - uwsgi --ini /srv/jodlgang/jodlgang_uwsgi.ini
+
+checker:
+  module: jodlgang
+  class: JodlGangChecker
+  debian_packages:
+    - python3
+    - python3-requests
+    - python3-bs4
