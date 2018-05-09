@@ -17,7 +17,6 @@ class JodlGangChecker(BaseChecker):
         if self.client.logged_in:
             return OK
 
-        max_attempts = 3
         num_attempts = 0
         # If we haven't managed to log in after `max_attempts`, then we're sick of trying
         while num_attempts < max_attempts:
