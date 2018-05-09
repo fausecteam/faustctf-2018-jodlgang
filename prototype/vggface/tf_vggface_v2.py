@@ -211,12 +211,12 @@ class VGGFace(object):
 
             return summaries
 
-    def train(self, training_tfrecords_file, validation_tfrecords_file, learning_rate, checkpoint_dir, summary_dir, vggface_trained_weights=None):
+    def train(self, training_tfrecords_file, validation_tfrecords_file, initial_learning_rate, checkpoint_dir, summary_dir, vggface_trained_weights=None):
         assert os.path.exists(training_tfrecords_file), "training set file does not exist"
         assert os.path.exists(validation_tfrecords_file), "validation set file does not exist"
 
         # Some constants
-        initial_patience = 50
+        initial_patience = 20
         num_steps_to_check_validation_set = 1000
         num_steps_to_check_loss = 100
 
@@ -256,6 +256,7 @@ class VGGFace(object):
 
         with tf.name_scope("optimizer"):
             global_step = tf.Variable(0, name="global_step", trainable=False)
+            learning_rate = tf.train.exponential_decay(initial_learning_rate, global_step=global_step, decay_steps=10000, decay_rate=0.9, staircase=True)
             optimizer = tf.train.AdamOptimizer(learning_rate)
             grads_and_vars = optimizer.compute_gradients(loss)
             train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
@@ -265,6 +266,7 @@ class VGGFace(object):
 
         # Summary
         loss_summary = tf.summary.scalar("loss", loss)
+        learning_rate_summary = tf.summary.scalar("learning_rate", learning_rate)
         accuracy_summary = tf.summary.scalar("accuracy", tf.reduce_mean(accuracy))
         grads_for_vars = {var_variable: grad for grad, var_variable in grads_and_vars}
         variable_summaries = []
@@ -272,7 +274,7 @@ class VGGFace(object):
             gradient = grads_for_vars[var_variable]
             variable_summaries.extend(self.variable_summaries(var_variable, gradient))
 
-        summary_op = tf.summary.merge([loss_summary, accuracy_summary] + variable_summaries)
+        summary_op = tf.summary.merge([loss_summary, accuracy_summary, learning_rate_summary] + variable_summaries)
 
         # Prepare paths for summaries
         summary_dir_name = time.strftime("%Y_%m_%d_%H_%M_%S") + "-" + self.name
