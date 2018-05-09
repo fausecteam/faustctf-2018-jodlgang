@@ -18,7 +18,7 @@ if __name__ == "__main__":
         cnn = VGGFace(sess, args["num_classes"])
         cnn.train(training_tfrecords_file=args["training_tfrecords_file"],
                   validation_tfrecords_file=args["validation_tfrecords_file"],
-                  learning_rate=args["learning_rate"],
+                  initial_learning_rate=args["learning_rate"],
                   checkpoint_dir=args["checkpoint_dir"],
                   summary_dir=args["summary_dir"],
                   vggface_trained_weights=args["vggface_trained_weights"])
