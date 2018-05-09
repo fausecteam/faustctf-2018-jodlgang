@@ -4,7 +4,7 @@ import re
 import requests
 import os
 from bs4 import BeautifulSoup
-from jodlgang.constants import OK, TIMEOUT, NOTFOUND, NOTWORKING, RECOVERING
+from ctf_gameserver.checker.constants import OK, TIMEOUT, NOTFOUND, NOTWORKING
 
 
 ERROR_STATUS_CONSTANTS = [TIMEOUT, NOTFOUND, NOTWORKING]
