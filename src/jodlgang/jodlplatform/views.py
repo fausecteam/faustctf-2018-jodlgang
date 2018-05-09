@@ -50,13 +50,13 @@ def add_note(request):
     }
 
     current_user = request.user
-    if "note" in request.POST and "title" in request.POST:
+    if "text" in request.POST and "title" in request.POST:
         public = "public" in request.POST
-        note = request.POST["note"]
+        text = request.POST["text"]
         title = request.POST["title"]
-        if len(note) > 0 and len(title):
-            Note(author=current_user, text=note, title=title, public=public).save()
-            return HttpResponseRedirect("/home/")
+        if len(text) > 0 and len(title):
+            Note(author=current_user, text=text, title=title, public=public).save()
+            return render(request, "added_note.html", context=context)
 
     return render(request, "add_note.html", context=context)
 

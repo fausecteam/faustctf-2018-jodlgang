@@ -24,15 +24,15 @@
 
     <div class="container">
         <!-- Latest notes go here -->
-        <div class="list-group">
+        <div class="list-group notes">
             {% for note in notes %}
                 <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
                     <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{{ note.title }}</h5>
-                        <small>{{ note.pub_date }}</small>
+                        <h5 class="mb-1 title">{{ note.title }}</h5>
+                        <small class="date">{{ note.pub_date }}</small>
                     </div>
-                    <p class="mb-1">{{ note.text }}</p>
-                    <small>{{ note.author.name }}</small>
+                    <p class="mb-1 text">{{ note.text }}</p>
+                    <small class="author">{{ note.author.name }}</small>
                 </a>
             {% endfor %}
         </div>
