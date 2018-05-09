@@ -35,8 +35,14 @@ class JodlGangClient(object):
             self.logger.warning("Login page gave status code {:d}".format(resp.status_code))
             return False
 
+        # Check if this looks like the login page
+        html_page = resp.text
+        if not self._is_login_page(html_page):
+            self.logger.warning("This is not the expected login page")
+            return False
+
         # Locate CSRF token
-        csrf_token_match = login_csrf_re.search(resp.text)
+        csrf_token_match = login_csrf_re.search(html_page)
         if not csrf_token_match:
             self.logger.warning("Could not locate CSRF token in login page")
             return False
@@ -156,6 +162,23 @@ class JodlGangClient(object):
 
         return parsed_notes
 
+    @staticmethod
+    def _is_login_page(html_page):
+        """
+        Tells whether the given page is the login page, based on whether it contains the "Please sign in" heading
+        :param html_page: html page as string
+        :return: True if it seems to be the login page, False otherwise
+        """
+        soup = BeautifulSoup(html_page, "html.parser")
+        heading = soup.find("h1", class_="h3")
+        if not heading:
+            return False
+
+        if heading.text == "Please sign in":
+            return True
+
+        return False
+
     def list_public_notes(self):
         """
         Grabs the list of public notes
@@ -163,9 +186,9 @@ class JodlGangClient(object):
         """
 
         # Make sure we have signed in successfully
-        # if not self.logged_in:
-        #     self.logger.warning("You need to sign in before you can post an advice")
-        #     return False
+        if not self.logged_in:
+            self.logger.warning("You need to sign in before you can post an advice")
+            return False
 
         # Request the public notes page
         resp = self.s.get(self.url_base + "/home/")
@@ -173,7 +196,13 @@ class JodlGangClient(object):
             self.logger.warning("Public notes page gave status code {:d}".format(resp.status_code))
             return False
 
-        return self._parse_notes_page(resp.text)
+        # Check if this looks like the login page
+        html_page = resp.text
+        if self._is_login_page(html_page):
+            self.logger.warning("Was unexpectedly forwarded to the login page while trying to view the personal notes")
+            return False
+
+        return self._parse_notes_page(html_page)
 
     def list_personal_notes(self):
         """
@@ -192,7 +221,13 @@ class JodlGangClient(object):
             self.logger.warning("Personal notes page gave status code {:d}".format(resp.status_code))
             return False
 
-        return self._parse_notes_page(resp.text)
+        # Check if this looks like the login page
+        html_page = resp.text
+        if self._is_login_page(html_page):
+            self.logger.warning("Was unexpectedly forwarded to the login page while trying to view the personal notes")
+            return False
+
+        return self._parse_notes_page(html_page)
 
     def log_out(self):
         # Make sure we have signed in successfully
