@@ -27,6 +27,8 @@ build_job:
     paths:
       - metadata.yml
       - dist_root/
+    # The artifacts are quite large, we don't want to use too much space on GitLab
+    expire_in: 1 hour
   only:
     - master
   tags:
