@@ -1,10 +1,11 @@
-import os
-from jodlgang.client import JodlClient
+from jodlgang.client import JodlGangClient
 from jodlgang.data_utils.face_db import available_faces
 from jodlgang.data_utils.celeb_labels import get_celeb_labels, get_new_name_labels
-import json
+import logging
 
 import argparse
+
+log = logging.getLogger('jodlgnag.tests.test_login')
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--team-id', default=1, type=int)
@@ -28,6 +29,6 @@ if args.img_path_to_use is None:
 else:
     face_path = args.img_path_to_use
 
-c = JodlClient('localhost', 8000)
-c.login(email, 'fearofmissingout', face_id_path=face_path)
+c = JodlGangClient('localhost', 8000, log)
+c.login(username=email, face_img_path=face_path)
 print(c)

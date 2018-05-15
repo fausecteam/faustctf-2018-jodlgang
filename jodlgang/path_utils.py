@@ -13,7 +13,7 @@ class ExtraLoadPaths:
         return None
 
     def __exit__(self, *args):
-        import ipdb; ipdb.set_trace()
+        #import ipdb; ipdb.set_trace()
         sys.path = list(self.preserved_sys_path)
 
 SERVER_DIR = join(dirname(abspath(__file__)), '..', 'src', 'jodlgang')
