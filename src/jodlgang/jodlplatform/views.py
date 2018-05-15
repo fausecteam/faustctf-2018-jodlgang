@@ -50,9 +50,9 @@ def add_note(request):
     }
 
     current_user = request.user
-    if "text" in request.POST and "title" in request.POST:
+    if "note" in request.POST and "title" in request.POST:
         public = "public" in request.POST
-        text = request.POST["text"]
+        text = request.POST["note"]
         title = request.POST["title"]
         if len(text) > 0 and len(title):
             Note(author=current_user, text=text, title=title, public=public).save()
