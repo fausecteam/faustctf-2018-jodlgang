@@ -1,7 +1,7 @@
 from os.path import join
 
 import os
-from jodlgang.path_utils import ExtraLoadPaths, SERVER_DIR
+from ..path_utils import ExtraLoadPaths, SERVER_DIR
 
 with ExtraLoadPaths(SERVER_DIR):
     from tensorwow import model

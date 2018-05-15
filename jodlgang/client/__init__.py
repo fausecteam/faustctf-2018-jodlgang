@@ -1,1 +1,1 @@
-from .client import JodlClient
+from .jodlgangclient import JodlGangClient

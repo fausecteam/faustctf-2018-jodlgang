@@ -2,8 +2,8 @@
 
 
 from ctf_gameserver.checker import BaseChecker, OK, NOTFOUND, NOTWORKING, TIMEOUT
-from jodlgang.constants import CRYPTO_LINGO
-from jodlgang.jodlgangclient import JodlGangClient
+from .constants import CRYPTO_LINGO
+from .jodlgangclient import JodlGangClient
 import random
 import json
 import os
