@@ -20,13 +20,15 @@ build_job:
     - dist_root/srv/jodlgang/jodlenv/bin/pip install -r requirements.txt # Install python libraries
     - dist_root/srv/jodlgang/jodlenv/bin/python src/jodlgang/manage.py collectstatic --no-input # Let Django collect its static files
     - cp webserver/nginx/jodlgang_nginx.conf dist_root/srv/jodlgang/ # Copy nginx configuration
-    - cp webserver/uwsgi/{jodlgang_uwsgi.ini,uwsgi_params} dist_root/srv/jodlgang/ # Copy uwsgi configuration
+    - cp webserver/uwsgi/{uwsgi_params,jodlgang_uwsgi.ini,uwsgi.service} dist_root/srv/jodlgang/ # Copy uwsgi configuration
     - rsync -av src/jodlgang dist_root/srv/jodlgang/ --exclude "__pycache__" --exclude "migrations" --exclude "*.h5" # Copy django files
     - wget -O dist_root/srv/jodlgang/jodlgang/cnn_weights.h5 https://faust.cs.fau.de/files/internal/ci/faustctf/2018/jodlgang/cnn_weights.h5 # Download CNN weights
   artifacts:
     paths:
       - metadata.yml
       - dist_root/
+    # The artifacts are quite large, we don't want to use too much space on GitLab
+    expire_in: 1 hour
   only:
     - master
   tags:

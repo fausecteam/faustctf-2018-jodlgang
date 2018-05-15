@@ -10,11 +10,18 @@ install:
     - python3-dev
     - nginx-full
     - python3-pip
+    - python3-setuptools
   postinst_commands:
     - ln -s /srv/jodlgang/jodlgang_nginx.conf /etc/nginx/sites-enabled/
     - chmod 751 /srv/jodlgang # Give nginx permission to traverse into static files directory
-    - pip3 install uwsgi # TODO there are a few steps missing in between
-    - systemctl restart nginx
+    - pip3 install wheel
+    - pip3 install uwsgi
+    - mv /srv/jodlgang/uwsgi.service /etc/systemd/system/uwsgi.service  # systemd script for uWSGI
+    - mkdir -p /etc/uwsgi/sites # Create directory for site configurations
+    - mv /srv/jodlgang/jodlgang_uwsgi.ini /etc/uwsgi/sites/ # uWSGI configuration for jodlgang service
+    - systemctl daemon-reload # Refresh systemd with new uWSGI service on board
+    - systemctl start uwsgi # Start the script
+    - systemctl enable uwsgi # Start uWSGI after reboot
 
 checker:
   module: jodlgang
