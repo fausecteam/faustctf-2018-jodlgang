@@ -1,10 +1,12 @@
-from django.contrib.auth.forms import AuthenticationForm, UsernameField
+from django.contrib.auth.forms import UsernameField
 from django import forms
 from django.contrib.auth import (
-    authenticate, get_user_model, password_validation,
+    authenticate, get_user_model,
 )
 from django.utils.text import capfirst
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext_lazy as _
+
+
 UserModel = get_user_model()
 
 
@@ -40,7 +42,33 @@ class FaceAuthenticationForm(forms.Form):
     def clean(self):
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
-        face_img = self.request.FILES["face_img"].file if "face_img" in self.request.FILES else None
+
+        # Reject if face image is missing
+        if "face_img" not in self.request.FILES:
+            raise forms.ValidationError(
+                self.error_messages['invalid_login'],
+                code='invalid_login',
+                params={'face_img': "Face image is missing"}
+            )
+
+        # Reject if face image is not one of the allowed content types
+        face_img = self.request.FILES["face_img"]
+        if face_img.content_type not in {"image/jpeg", "image/png"}:
+            raise forms.ValidationError(
+                self.error_messages['invalid_login'],
+                code='invalid_login',
+                params={'face_img': "File format not recognized"}
+            )
+
+        # Reject large images
+        if face_img.size > 1024 * 1024:
+            raise forms.ValidationError(
+                self.error_messages['invalid_login'],
+                code='invalid_login',
+                params={'face_img': "File too large"}
+            )
+
+        face_img = face_img.file
 
         if username is not None:
             self.user_cache = authenticate(self.request, username=username, password=password, face_img=face_img)
