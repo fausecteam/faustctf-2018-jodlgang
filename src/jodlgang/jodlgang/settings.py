@@ -137,9 +137,13 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, "static")
 CNN_WEIGHTS = os.path.abspath("cnn_weights.h5")
 
 
-# Read team id
-with open("/etc/team-id") as f:
-    TEAM_ID = int(f.read())
+# Read team id from /etc/team-id to show local ambassador in footer
+if os.path.exists("/etc/team-id"):
+    with open("/etc/team-id") as f:
+        TEAM_ID = int(f.read())
+else:
+    # Default team id
+    TEAM_ID = 530
 
 
 LOGGING = {
