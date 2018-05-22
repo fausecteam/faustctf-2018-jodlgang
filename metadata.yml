@@ -13,6 +13,7 @@ install:
     - python3-setuptools
   postinst_commands:
     - ln -s /srv/jodlgang/jodlgang_nginx.conf /etc/nginx/sites-enabled/
+    - chown -R jodlgang:jodlgang /srv/jodlgang/jodlgang # Give uwsgi process permissions to run as uid jodlgang
     - chmod 751 /srv/jodlgang # Give nginx permission to traverse into static files directory
     - pip3 install wheel
     - pip3 install uwsgi
