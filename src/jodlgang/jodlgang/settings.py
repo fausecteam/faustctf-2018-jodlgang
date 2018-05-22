@@ -19,8 +19,18 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'stn!6mot3v7czj+ifxxzrh*6nw#b9h1(%t&u)rst%#54ci+*$a'
+# On first app start create secret key that Django uses for signing
+secret_key_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".django_secret_key")
+if not os.path.exists(secret_key_file):
+    from django.core.management.utils import get_random_secret_key
+    secret_key = get_random_secret_key()
+    with open(secret_key_file, "w") as f:
+        f.write(secret_key)
+
+    SECRET_KEY = secret_key
+else:
+    with open(secret_key_file, "r") as f:
+        SECRET_KEY = f.read().strip()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -154,7 +164,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'debug.log',
+            'filename': 'jodlgang.log',
         },
     },
     'loggers': {
@@ -163,5 +173,9 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO'
+        }
     },
 }
