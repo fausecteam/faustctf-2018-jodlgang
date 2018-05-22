@@ -9,9 +9,6 @@
 {% block body %}
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
         <h5 class="my-0 mr-md-auto font-weight-normal">JODL GANG</h5>
-        <nav class="my-2 my-md-0 mr-md-3">
-            <a class="p-2 text-dark" href="#">About</a>
-        </nav>
         {% if request.user.is_authenticated %}
         <nav class="my-2 my-md-0 mr-md-3">
             <span class="p-2 text-dark">{{ user.get_username }}</span>
@@ -25,4 +22,12 @@
     {% block content %}
 
     {% endblock %}
+
+    <div class="container">
+        <footer class="pt-4 my-md-5 pt-md-5 border-top">
+            <div class="row">
+                Contact our local ambassador&nbsp;<a href="mailto:{{ ambassador_email }}" title="Message {{ ambassador_email }}" class="ambassador-email">{{ ambassador_name }}</a>
+            </div>
+        </footer>
+    </div>
 {% endblock %}
