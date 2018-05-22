@@ -46,7 +46,6 @@ class FaceAuthenticationBackend(object):
             return user
         except Exception as e:
             logger.error("Exception in face recognition: {} ({})".format(str(e), type(e)))
-            PermissionDenied
 
     def get_user(self, user_id):
         try:
