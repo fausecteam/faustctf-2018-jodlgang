@@ -1,3 +1,3 @@
 #!/usr/bin/python
 
-#from .jodlgangchecker import JodlGangChecker
+from .jodlgangchecker import JodlGangChecker
