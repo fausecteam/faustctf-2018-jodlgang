@@ -99,11 +99,11 @@ class JodlGangClient(object):
         self._logged_in = True
         return OK
 
-    def post_note(self, title, text, public=True):
+    def post_note(self, title, note, public=True):
         """
         Leaves a new note on behalf of the currently signed in user
         :param title: title of the note
-        :param text: note text
+        :param note: note text
         :param public: whether this is supposed to be a public or personal note (only visible to the user himself/herself)
         :return: status constant
         """
@@ -131,7 +131,7 @@ class JodlGangClient(object):
         csrftoken = csrf_token_match.group(1)
 
         # Post note
-        params = dict(title=title, text=text, csrfmiddlewaretoken=csrftoken)
+        params = dict(title=title, note=note, csrfmiddlewaretoken=csrftoken)
         if public:
             params["public"] = "on"
 
@@ -202,7 +202,7 @@ class JodlGangClient(object):
         parsed_notes = []
         for note in notes:
             parsed_note = self._parse_note(note)
-            if False == parsed_note:
+            if NOTWORKING == parsed_note:
                 self._logger.warning("Error parsing notes")
                 return NOTWORKING
 
@@ -312,6 +312,36 @@ class JodlGangClient(object):
 
         self._logged_in = False
         return OK
+
+    def get_local_ambassador(self):
+        """
+        Reads the name of the ambassador from the base page's footer
+        :return: ambassador name and email as tuple, or NOTWORKING on error
+        """
+        try:
+            resp = self._s.get(self._url_base, timeout=self._timeout)
+        except (requests.Timeout, requests.ConnectionError) as e:
+            self._logger.warning("{} while reading base url".format(self._exception_name(e)))
+            return TIMEOUT
+
+        if resp.status_code != 200:
+            self._logger.warning("Requesting base page gave status code {:d}".format(resp.status_code))
+            return NOTWORKING
+
+        soup = BeautifulSoup(resp.text, "html.parser")
+        ambassador_mailto_tag = soup.find("a", class_="ambassador-email")
+        if not ambassador_mailto_tag:
+            self._logger.warning("Cannot find ambassador email")
+            return NOTWORKING
+
+        ambassador_name = ambassador_mailto_tag.text
+        ambassador_email = ambassador_mailto_tag["href"]
+        if not ambassador_email.startswith("mailto:"):
+            self._logger.warning("Ambassador email does not start with mailto")
+            return NOTWORKING
+        ambassador_email = ambassador_email[7:]
+
+        return ambassador_name, ambassador_email
 
 
 if __name__ == "__main__":

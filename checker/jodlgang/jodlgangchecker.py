@@ -2,8 +2,8 @@
 
 
 from ctf_gameserver.checker import BaseChecker, OK, NOTFOUND, NOTWORKING, TIMEOUT
-from .constants import CRYPTO_LINGO
-from .jodlgangclient import JodlGangClient
+from jodlgang.constants import CRYPTO_LINGO
+from jodlgang.jodlgangclient import JodlGangClient
 import random
 import json
 import os
@@ -72,7 +72,7 @@ class JodlGangChecker(BaseChecker):
         # Randomly select one of the images files
         return random.choice(img_files)
 
-    def log_in(self, max_attempts=3):
+    def log_in(self, max_attempts=1):
         if self.client.logged_in:
             return OK
 
@@ -99,8 +99,8 @@ class JodlGangChecker(BaseChecker):
 
         # Post a note
         title = random.choice(CRYPTO_LINGO)
-        text = self.get_flag(str(self._tick))
-        post_advice_status = self.client.post_note(title, text, public=False)
+        note = self.get_flag(str(self._tick))
+        post_advice_status = self.client.post_note(title, note, public=False)
         if OK != post_advice_status:
             self.logger.warning("Could not place advice for team {}. Status {}".format(self._team, post_advice_status))
 
@@ -134,6 +134,18 @@ class JodlGangChecker(BaseChecker):
         return OK
 
     def check_service(self):
+        # Check ambassador
+        ambassador_status = self.client.get_local_ambassador()
+        if ambassador_status in ERROR_CODES:
+            self.logger.warning("Could not read local ambassador")
+            return NOTWORKING
+
+        # Verify that read ambassador email matches the user assigned to the given team
+        ambassador_name, ambassador_email = ambassador_status
+        if ambassador_email != self._get_user_email_address():
+            self.logger.warning("Ambassador and team user email do not match")
+            return NOTWORKING
+
         # Log in
         login_status = self.log_in()
         if OK != login_status:
@@ -164,10 +176,10 @@ class JodlGangChecker(BaseChecker):
 
 
 if __name__ == "__main__":
-    team = 42
+    team = 3
     host = "localhost"
     port = 8000
-    max_tick = 10
+    max_tick = 5
     for tick in range(max_tick):
         checker = JodlGangChecker(tick, team, host, port)
         assert OK == checker.place_flag()
