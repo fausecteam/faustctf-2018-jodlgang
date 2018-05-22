@@ -13,12 +13,13 @@ import re
 # TODO change data dir
 DATA_DIR = "/media/explicat/Moosilauke/ctf/facescrub/checker_dataset_non_filtered"
 ERROR_CODES = [NOTFOUND, NOTWORKING, TIMEOUT]
+PORT = 8000
 
 
 class JodlGangChecker(BaseChecker):
     def __init__(self, tick, team, service, ip):
         BaseChecker.__init__(self, tick, team, service, ip)
-        self.client = JodlGangClient(service, ip, self.logger)
+        self.client = JodlGangClient(ip, PORT, self.logger)
         self._tick = tick
         self._team = team
 
@@ -72,7 +73,7 @@ class JodlGangChecker(BaseChecker):
         # Randomly select one of the images files
         return random.choice(img_files)
 
-    def log_in(self, max_attempts=1):
+    def log_in(self, max_attempts=3):
         if self.client.logged_in:
             return OK
 
@@ -99,7 +100,7 @@ class JodlGangChecker(BaseChecker):
 
         # Post a note
         title = random.choice(CRYPTO_LINGO)
-        note = self.get_flag(str(self._tick))
+        note = self.get_flag(self._tick)
         post_advice_status = self.client.post_note(title, note, public=False)
         if OK != post_advice_status:
             self.logger.warning("Could not place advice for team {}. Status {}".format(self._team, post_advice_status))
@@ -121,7 +122,7 @@ class JodlGangChecker(BaseChecker):
             return notes
 
         # Find the flag among the personal notes
-        flag_to_check = self.get_flag(str(tick))
+        flag_to_check = self.get_flag(tick)
         notes_containing_the_flag = list(filter(lambda note: note["text"].strip() == flag_to_check, notes))
         num_notes_containing_the_flag = len(notes_containing_the_flag)
         if 0 == num_notes_containing_the_flag:
