@@ -136,7 +136,10 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, "static")
 
 CNN_WEIGHTS = os.path.abspath("cnn_weights.h5")
 
-TEAM_ID = 3
+
+# Read team id
+with open("/etc/team-id") as f:
+    TEAM_ID = int(f.read())
 
 
 LOGGING = {
