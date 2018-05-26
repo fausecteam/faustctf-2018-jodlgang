@@ -1,5 +1,7 @@
 # Adversarial Machine Learning Challenge
 
+Jodlgang is an investment syndicate whose fellow patrons irresponsibly gamble with their trusting client's savings on the crypto market.
+
 ## Pre-trained face recognition models
 * VGG-16, available from the [VGG website](http://www.robots.ox.ac.uk/%7Evgg/software/vgg_face/). Unfortunately, they only provide weights for Matlab, Torch, and Caffe but not for TensorFlow or Theano.
 * Luckily, someone [converted](https://github.com/rcmalli/keras-vggface/) the Caffe weights to work with Keras.
