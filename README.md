@@ -1,6 +1,6 @@
 # Adversarial Machine Learning Challenge
 
-Jodlgang is an investment syndicate whose fellow patrons irresponsibly gamble with their trusting client's savings on the volatile cryptocurrencies market.
+Jodlgang is an investment syndicate whose fellow patrons irresponsibly gamble with their trusting clients' savings on the volatile cryptocurrencies market.
 The website provides a platform, where registered patrons exchange brief notes and organize themselves. Patrons can also save private notes only to be seen by each individual himself.
 There are 530 active patrons, and registration is closed at the moment.
 
