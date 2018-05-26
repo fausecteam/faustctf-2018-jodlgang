@@ -7,12 +7,12 @@ There are 530 active patrons, and registration is closed at the moment.
 The Jodlgang platfrom replaced the old password login for a state-of-the-art face authentication system. To sign in, a patron must provide an image of his face alongside her or his email address.
 The face snap must be a color image of size 224x224 pixels and must not be larger than 1MB.
 
-The Jodlgang platform is distributed among multiple machines (i.e., there is one platform for each team), each of which runs a standalone version of the platform. There is no synchronization going on between these platforms. One of the registered patrons is assigned as an ambassador to each platform. This patron is chosen based on the team id.
+The Jodlgang platform is distributed among multiple machines (i.e., there is one platform for each team), each of which runs a standalone version of the platform. There is no synchronization going on between these platforms. One of the registered patrons is assigned as an ambassador to each platform. The patron assignment is chosen based on the team id.
 
 To hide flags, the game server logs in as the ambassador user and stores the flag as a private note.
 
 ## Vulnerabilities
-All you have to do to steal the private notes including the flags from team 42 is to log in as user 42. Since the platform requires face authentication, you will need to persude the face recognition system that your uploaded face image shows patron 42. Unfortunately you don't know how this patrons looks like. The face recognition system consists of a state-of-the-art convolutional neural network (CNN) that has been trained to distinguish between the 530 registered patrons.
+All you have to do to steal the private notes including the flags from team 42 is to log in as user 42. Since the platform requires face authentication, you will need to persuade the face recognition system that your uploaded face image shows patron 42. Unfortunately you don't know how this patrons looks like. The face recognition system consists of a state-of-the-art convolutional neural network (CNN) that has been trained to distinguish between the 530 registered patrons.
 
 Luckily, you have access to all parameters of the CNN: the network architecture and the trained weights and biases. This allows you to craft adversarial examples. An adversarial example is an example that has been carefully perturbed to fool the CNN. Our pure Python-CNN implementation `Tensorwow` is actually fully compatible to `TensorFlow`, thus it might help to reimplement the CNN in TensorFlow and restore the trained weights there.
 This way you can craft an adversarial example image that fools the CNN into thinking you are user 42.
