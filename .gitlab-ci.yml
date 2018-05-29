@@ -14,7 +14,8 @@ build_job:
     paths:
       - .apt/
   script:
-    - cp requirements.txt dist_root/srv/jodlgang # Copy requirements
+    - mkdir -p dist_root/srv/jodlgang/
+    - cp requirements.txt dist_root/srv/jodlgang/ # Copy requirements
     - cp webserver/nginx/jodlgang_nginx.conf dist_root/srv/jodlgang/ # Copy nginx configuration
     - cp webserver/uwsgi/{uwsgi_params,jodlgang_uwsgi.ini,uwsgi.service} dist_root/srv/jodlgang/ # Copy uwsgi configuration
     - rsync -av src/jodlgang dist_root/srv/jodlgang/ --exclude "__pycache__" --exclude "migrations" --exclude "*.h5" --exclude ".django_secret_key" # Copy django files
