@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}
+    <title>JODL GANG</title>
+{% endblock %}
+
+{% block content %}
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h1 class="display-4">About</h1>
+        <p class="lead">JODL gang is an investment group whose fellow patrons provide consultation services to their trusting clients.</p>
+    </div>
+
+    <div class="container">
+        <div class="card-deck mb-3">
+            <p>This website provides a platform where registered patrons exchange brief notes and organize themselves. Patrons can also save private notes only to be seen by each individual himself.
+                There are 530 active patrons, and registration is closed at the moment. There are several platforms available in different regions. Each of these platforms is maintained by one of our fellow patrons. The local ambassador of this site is <a href="mailto:{{ ambassador_email }}" title="Message {{ ambassador_email }}" class="ambassador-email">{{ ambassador_name }}</a>.</p>
+
+            <p>Recently, the JODL gang platfrom replaced the old password login for a much safer state-of-the-art face authentication system. To sign in, a patron must provide an image of his face alongside his email address. The face image must be a color image of size 224x224 pixels and must not be larger than 1MB.</p>
+        </div>
+    </div>
+{% endblock %}

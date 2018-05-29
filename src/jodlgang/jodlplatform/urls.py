@@ -6,6 +6,7 @@ from .forms import FaceAuthenticationForm
 urlpatterns = [
     # path('accounts/', include('django.contrib.auth.urls')),
     url(r'^$', views.index, name='index'),
+    url(r'^about/$', views.about, name='about'),
     url(r'^home/$', views.home, name='home'),
     url(r'^personal/$', views.personal_notes, name='personal'),
     url(r'^note/$', views.add_note, name='add_note'),
