@@ -11,7 +11,7 @@ import re
 
 
 # TODO change data dir
-DATA_DIR = "/media/explicat/Moosilauke/ctf/facescrub/checker_dataset_non_filtered"
+DATA_DIR = "/srv/jodlgang/checker_dataset"
 ERROR_CODES = [NOTFOUND, NOTWORKING, TIMEOUT]
 PORT = 8000
 
