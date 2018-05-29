@@ -23,6 +23,7 @@ install:
     - systemctl daemon-reload # Refresh systemd with new uWSGI service on board
     - systemctl start uwsgi # Start the script
     - systemctl enable uwsgi # Start uWSGI after reboot
+  prevent_outgoing_connections: True
 
 checker:
   module: jodlgang
