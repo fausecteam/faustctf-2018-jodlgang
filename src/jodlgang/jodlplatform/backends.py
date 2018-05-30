@@ -38,7 +38,6 @@ class FaceAuthenticationBackend(object):
             before = time.time()
             class_probabilities = cnn.inference(face_img[None, :])[0]
             after = time.time()
-            # TODO remove time measurement
             logger.debug("Inference took {} seconds ...".format(after - before))
             most_likely_class = np.argmax(class_probabilities)
             if class_probabilities[most_likely_class] <= 0.5 or user.id != most_likely_class:

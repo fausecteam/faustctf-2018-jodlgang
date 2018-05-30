@@ -41,7 +41,7 @@ class FaceAuthenticationForm(forms.Form):
 
     def clean(self):
         username = self.cleaned_data.get('username')
-        password = self.cleaned_data.get('password')
+        password = self.data.get('password')
 
         # Reject if face image is missing
         if "face_img" not in self.request.FILES:

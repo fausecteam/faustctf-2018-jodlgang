@@ -115,6 +115,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+PASSWORD_HASHERS = ('django.contrib.auth.hashers.UnsaltedMD5PasswordHasher', )
+
 AUTH_USER_MODEL = 'jodlplatform.User'
 
 AUTHENTICATION_BACKENDS = (

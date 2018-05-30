@@ -123,7 +123,6 @@ class FaceRecognitionCNN(object):
         x = self.preprocess(images)
         # Forward pass
         for name, layer in self._layers.items():
-            print("Feeding through layer {}".format(name))
             x = layer.forward(x)
 
             # Flatten activations when transitioning from convolutional cascade to fully-connected layers
