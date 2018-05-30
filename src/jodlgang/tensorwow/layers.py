@@ -5,7 +5,6 @@ from tensorwow.im2col import im2col_indices
 class FullyConnectedLayer(object):
     def __init__(self, num_input_units, num_output_units, activation_func, weights_initializer, bias_initializer):
         """
-
         :param num_input_units: Number of input dimensions D
         :param num_output_units: Number of output dimensions O
         :param activation_func: Activation function
