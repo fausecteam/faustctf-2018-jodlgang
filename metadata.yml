@@ -20,13 +20,13 @@ install:
     - /srv/jodlgang/jodlenv/bin/pip install wheel # Install wheel first
     - /srv/jodlgang/jodlenv/bin/pip install -r /srv/jodlgang/requirements.txt # Install python packages
     - rm /srv/jodlgang/requirements.txt # Clean up requirements file
-    - sudo -u postgres psql -f /tmp/postgres/01_set_up_database.sql # Create jodlplatform database and jodlgang user
-    - /srv/jodlgang/jodlenv/bin/python /srv/jodlgang/jodlgang/manage.py migrate # Seed database
-    - rm -rf /tmp/postgres # Clean up initial database scripts
     - /srv/jodlgang/jodlenv/bin/python /srv/jodlgang/jodlgang/manage.py collectstatic --no-input # Let Django collect its static files
     - ln -s /srv/jodlgang/jodlgang_nginx.conf /etc/nginx/sites-enabled/
     - chown -R jodlgang:jodlgang /srv/jodlgang/jodlgang # Give uwsgi process permissions to run as uid jodlgang
     - chmod 751 /srv/jodlgang # Give nginx permission to traverse into static files directory
+    - sudo -u postgres psql -f /srv/jodlgang/postgres/01_set_up_database.sql # Create jodlplatform database and jodlgang user
+    - /srv/jodlgang/jodlenv/bin/python /srv/jodlgang/jodlgang/manage.py migrate # Seed database
+    - rm -rf /srv/jodlgang/postgres/ # Clean up initial database scripts
     - pip3 install wheel
     - pip3 install uwsgi
     - mv /srv/jodlgang/uwsgi.service /etc/systemd/system/uwsgi.service  # systemd script for uWSGI
