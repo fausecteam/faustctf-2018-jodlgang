@@ -19,3 +19,11 @@ CRYPTO_LINGO = [
     "SHITCOIN",
     "REVERSE INDICATOR"
 ]
+
+RANDOM_NOTES = [
+    "/bin/sh",
+    "bin/ncat",
+    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "Holadaittijo"
+]

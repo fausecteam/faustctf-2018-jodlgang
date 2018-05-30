@@ -2,7 +2,7 @@
 
 
 from ctf_gameserver.checker import BaseChecker, OK, NOTFOUND, NOTWORKING, TIMEOUT
-from jodlgang.constants import CRYPTO_LINGO
+from jodlgang.constants import CRYPTO_LINGO, RANDOM_NOTES
 from jodlgang.jodlgangclient import JodlGangClient
 import random
 import json
@@ -10,7 +10,6 @@ import os
 import re
 
 
-# TODO change data dir
 DATA_DIR = "/srv/jodlgang/checker_dataset"
 ERROR_CODES = [NOTFOUND, NOTWORKING, TIMEOUT]
 PORT = 8000
@@ -107,6 +106,21 @@ class JodlGangChecker(BaseChecker):
 
         return post_advice_status
 
+    def _post_random_note(self):
+        # Log in
+        login_status = self.log_in()
+        if OK != login_status:
+            self.logger.warning("Could not log in when trying to place random note for team {}. Status {}".format(self._team, login_status))
+            return login_status
+
+        title = random.choice(CRYPTO_LINGO)
+        note = random.choice(RANDOM_NOTES)
+        post_advice_status = self.client.post_note(title, note, public=False)
+        if OK != post_advice_status:
+            self.logger.warning("Could not place random note for team {}. Status {}".format(self._team, post_advice_status))
+
+        return post_advice_status
+
     def check_flag(self, tick):
         # Log in
         login_status = self.log_in()
@@ -152,6 +166,13 @@ class JodlGangChecker(BaseChecker):
         if OK != login_status:
             self.logger.warning("Could not log in when trying to check flag for team {}. Status {}".format(self._team, login_status))
             return login_status
+
+        # Place a random note in about 10% of the cases
+        if random.random() > 0.9:
+            post_random_note_status = self._post_random_note()
+            if OK != post_random_note_status:
+                self.logger.warning("Could not post random note for team {}. Status {}".format(self._team, post_random_note_status))
+                return post_random_note_status
 
         # Retrieve the public notes
         notes = self.client.list_public_notes()
