@@ -28,7 +28,7 @@ install:
     - chmod 664 /etc/systemd/system/jodlgang-db-pwd.service # Prepare to install systemd service
     - chown -R jodlgang:www-data /srv/jodlgang/jodlgang # Give uwsgi process permissions to run as uid jodlgang
     - chmod 751 /srv/jodlgang # Give nginx permission to traverse into static files directory
-    - sudo -u postgres psql -f /srv/jodlgang/postgres/01_set_up_database.sql # Create jodlplatform database and jodlgang user
+    - su postgres -c 'psql -f /srv/jodlgang/postgres/01_set_up_database.sql' # Create jodlplatform database and jodlgang user
     - /srv/jodlgang/jodlenv/bin/python /srv/jodlgang/jodlgang/manage.py migrate # Seed database
     - rm -rf /srv/jodlgang/postgres/ # Clean up initial database scripts
     - pip3 install wheel
