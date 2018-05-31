@@ -1,9 +1,0 @@
-[Unit]
-Before=uwsgi.service
-After=postgresql.service
-
-[Service]
-ExecStart=/srv/jodlgang/randomify_db_pwd.py
-
-[Install]
-WantedBy=default.target
