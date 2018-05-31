@@ -18,7 +18,6 @@ build_job:
     - cp requirements.txt dist_root/srv/jodlgang/ # Copy requirements
     - cp webserver/nginx/jodlgang_nginx.conf dist_root/srv/jodlgang/ # Copy nginx configuration
     - cp webserver/uwsgi/{uwsgi_params,jodlgang_uwsgi.ini,uwsgi.service} dist_root/srv/jodlgang/ # Copy uwsgi configuration
-    - cp -r webserver/postgres dist_root/srv/jodlgang/ # Copy script to initialize database
     - rsync -av src/jodlgang dist_root/srv/jodlgang/ --exclude "__pycache__" --exclude "*.h5" --exclude ".django_secret_key" --exclude "db.sqlite3" # Copy django files
     - wget -O dist_root/srv/jodlgang/jodlgang/cnn_weights.h5 https://faust.cs.fau.de/files/internal/ci/faustctf/2018/jodlgang/cnn_weights.h5 # Download CNN weights
   artifacts:
