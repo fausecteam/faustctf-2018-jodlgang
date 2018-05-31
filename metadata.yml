@@ -22,6 +22,10 @@ install:
     - rm /srv/jodlgang/requirements.txt # Clean up requirements file
     - /srv/jodlgang/jodlenv/bin/python /srv/jodlgang/jodlgang/manage.py collectstatic --no-input # Let Django collect its static files
     - ln -s /srv/jodlgang/jodlgang_nginx.conf /etc/nginx/sites-enabled/
+    - mv /srv/jodlgang/postgres/randomify_db_pwd.py /srv/jodlgang/ # Move password randomification script
+    - chmod 744 /srv/jodlgang/randomify_db_pwd.py # Make executable
+    - mv /srv/jodlgang/postgres/jodlgang-db-pwd.service /etc/systemd/system/ # Create systemd startup script to randomize database password on boot
+    - chmod 664 /etc/systemd/system/jodlgang-db-pwd.service # Prepare to install systemd service
     - chown -R jodlgang:www-data /srv/jodlgang/jodlgang # Give uwsgi process permissions to run as uid jodlgang
     - chmod 751 /srv/jodlgang # Give nginx permission to traverse into static files directory
     - sudo -u postgres psql -f /srv/jodlgang/postgres/01_set_up_database.sql # Create jodlplatform database and jodlgang user
@@ -35,6 +39,7 @@ install:
     - systemctl daemon-reload # Refresh systemd with new uWSGI service on board
     - systemctl start uwsgi # Start the script
     - systemctl enable uwsgi # Start uWSGI after reboot
+    - systemctl enable jodlgang-db-pwd.service # Enable password randomification script after reboot
   prevent_outgoing_connections: True
 
 checker:

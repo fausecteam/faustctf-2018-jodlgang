@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""
+Changes the default database password from 'tothemoon' to some unique string on first boot
+"""
 
 import random
 import string
