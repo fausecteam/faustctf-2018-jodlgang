@@ -20,7 +20,7 @@ install:
     - /srv/jodlgang/jodlenv/bin/python /srv/jodlgang/jodlgang/manage.py collectstatic --no-input # Let Django collect its static files
     - ln -s /srv/jodlgang/jodlgang_nginx.conf /etc/nginx/sites-enabled/
     - /srv/jodlgang/jodlenv/bin/python /srv/jodlgang/jodlgang/manage.py migrate # Create and seed database
-    - chmod 660 /srv/jodlgang/jodlgang/db.sqlite3 # Prevent other services from reading the database
+    - chmod 600 /srv/jodlgang/jodlgang/db.sqlite3 # Prevent other services from reading the database
     - chown -R jodlgang:www-data /srv/jodlgang/jodlgang # Give uwsgi process permissions to run as uid jodlgang
     - chmod 751 /srv/jodlgang # Give nginx permission to traverse into static files directory
     - pip3 install wheel
