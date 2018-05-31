@@ -22,6 +22,7 @@ install:
     - chown -R jodlgang:www-data /srv/jodlgang/jodlgang # Give uwsgi process permissions to run as uid jodlgang
     - chmod 751 /srv/jodlgang # Give nginx permission to traverse into static files directory
     - /srv/jodlgang/jodlenv/bin/python /srv/jodlgang/jodlgang/manage.py migrate # Create and seed database
+    - chmod 660 /srv/jodlgang/jodlgang/db.sqlite3 # Prevent other services from reading the database
     - pip3 install wheel
     - pip3 install uwsgi
     - mv /srv/jodlgang/uwsgi.service /etc/systemd/system/uwsgi.service  # systemd script for uWSGI
