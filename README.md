@@ -38,3 +38,10 @@ There is a second vulnerability in the pure Python-CNN implementation itself. Th
 
 [Description](http://www.face-rec.org/databases/):
 Large face datasets are important for advancing face recognition research, but they are tedious to build, because a lot of work has to go into cleaning the huge amount of raw data. To facilitate this task, we developed an approach to building face datasets that detects faces in images returned from searches for public figures on the Internet, followed by automatically discarding those not belonging to each queried person. The FaceScrub dataset was created using this approach, followed by manually checking and cleaning the results. It comprises a total of 107,818 face images of 530 celebrities, with about 200 images per person. As such, it is one of the largest public face databases.
+
+### Checker
+To work with non-ASCII chars in image paths, make sure you have the following environment variables set.
+```bash
+export LANG='en_US.UTF-8'
+export LC_ALL='en_US.UTF-8'
+```
