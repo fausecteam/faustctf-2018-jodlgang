@@ -1,6 +1,5 @@
-#!/usr/bin/python
-
-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from ctf_gameserver.checker import BaseChecker, OK, NOTFOUND, NOTWORKING, TIMEOUT
 from jodlgang.constants import CRYPTO_LINGO, RANDOM_NOTES
 from jodlgang.jodlgangclient import JodlGangClient
@@ -10,7 +9,11 @@ import os
 import re
 
 
-DATA_DIR = "/srv/jodlgang/checker_dataset"
+if "leifur" == os.uname().nodename:
+    DATA_DIR = "/media/explicat/Moosilauke/ctf/facescrub/checker_dataset"
+else:
+    DATA_DIR = "/srv/jodlgang/checker_dataset"
+
 ERROR_CODES = [NOTFOUND, NOTWORKING, TIMEOUT]
 PORT = 8000
 
