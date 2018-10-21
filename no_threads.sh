@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-export MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 OMP_NUM_THREADS=1

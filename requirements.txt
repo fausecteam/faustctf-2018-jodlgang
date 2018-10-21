@@ -8,4 +8,3 @@ django
 django-widget-tweaks
 h5py
 uwsgi
-psycopg2
