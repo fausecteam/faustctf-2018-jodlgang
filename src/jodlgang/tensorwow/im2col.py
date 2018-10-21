@@ -15,7 +15,7 @@ def get_im2col_indices_with_cache(x_shape, field_height, field_width, padding, s
 
 
 def get_im2col_indices(x_shape, field_height, field_width, padding=1, stride=1):
-    # First figure out what the size of the output should be
+    # This method originates from Stanford's CS231n class as part of assignment 2.
     N, H, W, C = x_shape
     assert (H + 2 * padding - field_height) % stride == 0
     assert (W + 2 * padding - field_height) % stride == 0
@@ -51,6 +51,6 @@ def im2col_indices(x, field_height, field_width, padding=1, stride=1):
     cols = x_padded[:, i, j, k]
     # Number of input channels C
     C = x.shape[3]
-    # Reshape to output size (kernel_size * number of channels), which is the number of pixels under one filter kernel, times the number of times to apply the kernel
+    # Reshape to output size (kernel_size * number of channels), which is the number of pixels under one filter kernel times the number of times to apply the kernel
     cols = cols.transpose(0, 2, 1).reshape(-1, field_height * field_width * C).T
     return cols
