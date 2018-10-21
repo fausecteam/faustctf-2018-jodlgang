@@ -19,27 +19,15 @@ This way you can craft an adversarial example image that fools the CNN into thin
 
 There is a second vulnerability in the pure Python-CNN implementation itself. The softmax activation function doesn't use the normalization trick, thus it is numerically unstable. By carefully perturbing your input image, you can cause the exp in the softmax activation to overflow, allowing you to sign in using the patron's email address, the patron's password which you can read from the database and which is the same for all platforms, and your perturbed image causing the overflow.
 
-## Authors' notes to themselves
+As a third vulnerability, password authentication is actually not disabled. If face authentication fails, the authentication backend falls back to regular password authentication.
 
-### Pre-trained face recognition models
-* VGG-16, available from the [VGG website](http://www.robots.ox.ac.uk/%7Evgg/software/vgg_face/). Unfortunately, they only provide weights for Matlab, Torch, and Caffe but not for TensorFlow or Theano.
+## Face recognition model
+* We use VGG-16, available from the [VGG website](http://www.robots.ox.ac.uk/%7Evgg/software/vgg_face/). Unfortunately, they only provide weights for Matlab, Torch, and Caffe but not for TensorFlow or Theano.
 * Luckily, someone [converted](https://github.com/rcmalli/keras-vggface/) the Caffe weights to work with Keras.
 * [Directly download the trained weights](https://github.com/rcmalli/keras-vggface/releases/download/v2.0/rcmalli_vggface_tf_vgg16.h5)
+* We fine-tuned the pre-trained network on the `FaceScrub` data set.
 
-### Data set
-
-* We do not want the teams to find the admin picture on the internet, thus we should not use too popular data sets.
-* Unless the data set consists of images from celebrities, because those could be from any data set.
-
-### FaceScrub
-
-* [Download script](https://github.com/lightalchemist/FaceScrub)
-* [Download FaceScrub files](https://github.com/faceteam/facescrub) containing links to the images
-
-[Description](http://www.face-rec.org/databases/):
-Large face datasets are important for advancing face recognition research, but they are tedious to build, because a lot of work has to go into cleaning the huge amount of raw data. To facilitate this task, we developed an approach to building face datasets that detects faces in images returned from searches for public figures on the Internet, followed by automatically discarding those not belonging to each queried person. The FaceScrub dataset was created using this approach, followed by manually checking and cleaning the results. It comprises a total of 107,818 face images of 530 celebrities, with about 200 images per person. As such, it is one of the largest public face databases.
-
-### Checker
+## Checker
 To work with non-ASCII chars in image paths, make sure you have the following environment variables set.
 ```bash
 export LANG='en_US.UTF-8'
