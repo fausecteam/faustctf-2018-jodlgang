@@ -23,9 +23,8 @@ As a third vulnerability, password authentication is actually not disabled. If f
 
 ## Face recognition model
 * We use VGG-16, available from the [VGG website](http://www.robots.ox.ac.uk/%7Evgg/software/vgg_face/). Unfortunately, they only provide weights for Matlab, Torch, and Caffe but not for TensorFlow or Theano.
-* Luckily, someone [converted](https://github.com/rcmalli/keras-vggface/) the Caffe weights to work with Keras.
-* [Directly download the trained weights](https://github.com/rcmalli/keras-vggface/releases/download/v2.0/rcmalli_vggface_tf_vgg16.h5)
-* We fine-tuned the pre-trained network on the `FaceScrub` data set.
+* Luckily, someone [converted](https://github.com/rcmalli/keras-vggface/) the Caffe weights to work with Keras [Directly download the trained weights](https://github.com/rcmalli/keras-vggface/releases/download/v2.0/rcmalli_vggface_tf_vgg16.h5)
+* We fine-tuned the pre-trained network on the `FaceScrub` data set. Although being assigned a new random name, each ambassador was one identity from this `FaceScrub` data set.
 
 ## Checker
 To work with non-ASCII chars in image paths, make sure you have the following environment variables set.
